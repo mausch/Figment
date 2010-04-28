@@ -45,7 +45,6 @@
     <Compile Include="Actions.fs" />
     <Content Include="Global.asax" />
     <Compile Include="Global.asax.fs" />
-    <None Include="Default.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

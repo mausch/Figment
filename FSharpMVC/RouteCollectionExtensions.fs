@@ -3,11 +3,8 @@
 open System.Web.Mvc
 open System.Web.Routing
 
-let content (action: unit -> string): ControllerContext -> ActionResult =
-    let f (ctx: ControllerContext) = 
-        let r = action() |> Result.content
-        r :> ActionResult
-    f
+let content (action: unit -> string) =
+    fun (ctx: ControllerContext) -> action() |> Result.content
 
 type RouteCollection with
     member x.MapGet(url, action: ControllerContext -> ActionResult) =
@@ -15,8 +12,7 @@ type RouteCollection with
 
     member x.MapGet(url, action: unit -> string) =
         let c = content action
-        ()
-        // x.MapGet(url, c)
+        x.MapGet(url, c)
 
 let get url (action: ControllerContext -> ActionResult) =
     RouteTable.Routes.MapGet(url, action)

@@ -1,4 +1,4 @@
-﻿module Actions
+﻿module SampleApp.Actions
 
 open System.Web
 open System.Web.Mvc

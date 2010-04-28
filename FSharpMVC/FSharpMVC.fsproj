@@ -44,7 +44,7 @@
     <Reference Include="System.Web.Routing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FSharpMvcRoute.fs" />
+    <Compile Include="RouteHandler.fs" />
     <Compile Include="Result.fs" />
     <Compile Include="RouteCollectionExtensions.fs" />
   </ItemGroup>
