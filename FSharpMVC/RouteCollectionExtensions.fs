@@ -8,7 +8,11 @@ let content (action: unit -> string) =
 
 type RouteCollection with
     member x.MapGet(url, action: ControllerContext -> ActionResult) =
-        x.Add(Route(url, FSharpMvcRouteHandler(action)))
+        let handler = FSharpMvcRouteHandler(action)
+        let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
+        let constraints = RouteValueDictionary()
+        let dataTokens = RouteValueDictionary()
+        x.Add(Route(url, defaults, constraints, dataTokens, handler))
 
     member x.MapGet(url, action: unit -> string) =
         let c = content action

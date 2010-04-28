@@ -4,9 +4,9 @@ open System.Web.Mvc
 
 let empty = EmptyResult() :> ActionResult
 
-let view model = 
+let view viewName model = 
     let viewData = ViewDataDictionary(Model = model)
-    ViewResult(ViewData = viewData) :> ActionResult
+    ViewResult(ViewData = viewData, ViewName = viewName) :> ActionResult
 
 let content s = 
     ContentResult(Content = s) :> ActionResult
