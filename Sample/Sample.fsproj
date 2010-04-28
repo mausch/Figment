@@ -23,9 +23,11 @@
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Sample.XML</DocumentationFile>
     <StartAction>Program</StartAction>
-    <StartProgram>c:\prg\FSharpMVC\Sample\WebStarter.exe</StartProgram>
+    <StartProgram>C:\prg\FSharpMVC\Sample\WebStarter.exe</StartProgram>
     <StartWorkingDirectory>
     </StartWorkingDirectory>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,6 +42,7 @@
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />
   <ItemGroup>
     <Content Include="web.config" />
+    <Compile Include="Actions.fs" />
     <Content Include="Global.asax" />
     <Compile Include="Global.asax.fs" />
     <None Include="Default.aspx" />
@@ -54,6 +57,13 @@
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Mvc, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="System.Web.Routing" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FSharpMVC\FSharpMVC.fsproj">
+      <Name>FSharpMVC</Name>
+      <Project>{a080b979-6e39-44c4-ac1a-4850e32c355a}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 	     Other similar extension points exist, see Microsoft.Common.targets.
