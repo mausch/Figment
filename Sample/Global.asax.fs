@@ -12,9 +12,10 @@ type MvcApplication() =
 
     member this.RegisterRoutes(routes: RouteCollection) = 
         routes.IgnoreRoute "asd"
-        //get "/" Actions.action1
         get "" (content action3)
         get "something" action2
+        get "action5" action5
+        get "action6" action6
 
     member this.Application_Start() =
         this.RegisterRoutes RouteTable.Routes

@@ -20,7 +20,6 @@ type FSharpMvcHandler(context: RequestContext, action: ControllerContext -> Acti
 type FSharpMvcRouteHandler(action: ControllerContext -> ActionResult) =
     interface IRouteHandler with
         member this.GetHttpHandler ctx = upcast FSharpMvcHandler(ctx, action)
-        
 
 (*type FSharpMvcRoute(action: ControllerContext -> #ActionResult) =
     inherit RouteBase()
