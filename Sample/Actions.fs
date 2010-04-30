@@ -3,6 +3,7 @@
 open System.Web
 open System.Web.Mvc
 open System.Web.Routing
+open System.Collections.Specialized
 open FSharpMvc.Result
 
 let action1 (ctx: ControllerContext) = empty
@@ -20,5 +21,17 @@ let action4 (ctx: ControllerContext) =
 let action5 (ctx: ControllerContext) =
     redirect "/"
 
-let action6 (ctx: ControllerContext) =
-    redirectToAction action2
+/// redirectToAction does not work
+(*let action6 (ctx: ControllerContext) =
+    redirectToAction action2*)
+
+(*let postAction6 (ctx: ControllerContext) = 
+    //redirect "/"
+    content "<h1>posted action6</h1>"*)
+
+let postAction6Easy (form: NameValueCollection) =
+    content "<h1>posted action6</h1>"
+
+[<ReflectedDefinition>]
+let postAction6Easier (somefield: string) =
+    sprintf "posted %s" somefield |> content

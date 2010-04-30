@@ -22,6 +22,7 @@ let redirectToRoute (routeValues: RouteValueDictionary) =
 /// doesn't work, can't compare IRouteHandlers
 let redirectToAction action =    
     let routes = Enumerable.OfType<Route> RouteTable.Routes
+    //let routes = RouteTable.Routes |> Enumerable.OfType
     let handler = FSharpMvcRouteHandler(action) :> IRouteHandler
     let route = routes |> Seq.find (fun r -> r.RouteHandler = handler)
     redirect route.Url

@@ -2,21 +2,29 @@
 
 open System.Web.Mvc
 open System.Web.Routing
-
-let content (action: unit -> string) =
-    fun (ctx: ControllerContext) -> action() |> Result.content
+open Combinators
 
 type RouteCollection with
-    member x.MapGet(url, action: ControllerContext -> ActionResult) =
+    member this.MapGet(url, action: ControllerContext -> ActionResult) =
+        this.MapWithMethod(url, "GET", action)
+
+    member this.MapGet(url, action: unit -> string) =
+        let c = contentAction action
+        this.MapGet(url, c)
+
+    member this.MapWithMethod(url, httpMethod, action: ControllerContext -> ActionResult) =
         let handler = FSharpMvcRouteHandler(action)
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
-        let constraints = RouteValueDictionary()
+        let httpMethodConstraint = HttpMethodConstraint([| httpMethod |])
+        let constraints = RouteValueDictionary(dict [("httpMethod", httpMethodConstraint :> obj)])
         let dataTokens = RouteValueDictionary()
-        x.Add(Route(url, defaults, constraints, dataTokens, handler))
+        this.Add(Route(url, defaults, constraints, dataTokens, handler))
 
-    member x.MapGet(url, action: unit -> string) =
-        let c = content action
-        x.MapGet(url, c)
+    member this.MapPost(url, action: ControllerContext -> ActionResult) =  
+        this.MapWithMethod(url, "POST", action)
 
 let get url (action: ControllerContext -> ActionResult) =
     RouteTable.Routes.MapGet(url, action)
+
+let post url (action: ControllerContext -> ActionResult) =
+    RouteTable.Routes.MapPost(url, action)
