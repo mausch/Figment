@@ -5,7 +5,7 @@ open System.Web
 open System.Web.Mvc
 open System.Web.Routing
 open System.Collections.Specialized
-open FSharpMvc.RouteCollectionExtensions
+open FSharpMvc.Routing
 open FSharpMvc.Combinators
 open FSharpMvc.Result
 open Actions

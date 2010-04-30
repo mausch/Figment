@@ -1,4 +1,4 @@
-﻿module FSharpMvc.RouteCollectionExtensions
+﻿module FSharpMvc.Routing
 
 open System.Web.Mvc
 open System.Web.Routing
