@@ -26,4 +26,9 @@ let bindForm (action: 'a -> ActionResult) (e: Expr<'a -> ActionResult>) =
                                 ModelMetadata = ModelMetadataProviders.Current.GetMetadataForType(null, typeof<'a>),
                                 ValueProvider = ctx.Controller.ValueProvider)
         let r = binder.BindModel(ctx, bindingContext)
+        if not bindingContext.ModelState.IsValid
+            then failwith "Binding failed"
         action (r :?> 'a)
+
+let bindFormToRecord (action: 'a -> ActionResult) =
+    ()
