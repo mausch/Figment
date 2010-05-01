@@ -9,7 +9,7 @@ type RouteCollection with
         this.MapWithMethod(url, "GET", action)
 
     member this.MapGet(url, action: unit -> string) =
-        let c = contentAction action
+        let c = action |> contentAction |> ignoreContext
         this.MapGet(url, c)
 
     member this.MapWithMethod(url, httpMethod, action: ControllerContext -> ActionResult) =

@@ -16,7 +16,7 @@ type MvcApplication() =
     member this.RegisterRoutes(routes: RouteCollection) = 
         routes.IgnoreRoute "asd"
         get "" action2
-        get "something" (contentAction action3)
+        get "something" (action3 |> contentAction |> ignoreContext)
         get "action5" action5
         //get "action6" action6
         //post "action6" (formAction postAction6Easy)

@@ -7,10 +7,13 @@ open System.Collections.Specialized
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 
-let contentAction (action: unit -> string) =
-    fun (ctx: ControllerContext) -> action() |> Result.content
+let ignoreContext (action: unit -> 'a) =
+    fun (ctx: ControllerContext) -> action()
 
-let formAction (action: NameValueCollection -> ActionResult) =
+let contentAction (action: 'a -> string) =
+    fun a -> action a |> Result.content
+
+let formAction (action: NameValueCollection -> 'a) =
     fun (ctx: ControllerContext) -> action ctx.HttpContext.Request.Form
 
 let bindForm (action: 'a -> 'b) (e: Expr<'a -> 'b>) = 
@@ -30,5 +33,5 @@ let bindForm (action: 'a -> 'b) (e: Expr<'a -> 'b>) =
             then failwith "Binding failed"
         action (r :?> 'a)
 
-let bindFormToRecord (action: 'a -> ActionResult) =
+let bindFormToRecord (action: 'a -> 'b) =
     ()
