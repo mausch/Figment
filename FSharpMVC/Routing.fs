@@ -1,5 +1,6 @@
 ﻿module FSharpMvc.Routing
 
+open System.Text.RegularExpressions
 open System.Web
 open System.Web.Mvc
 open System.Web.Routing
@@ -13,21 +14,42 @@ type RouteCollection with
         let c = action |> contentResult |> ignoreContext
         this.MapGet(url, c)
 
+    member this.MapAction(routeConstraint: HttpContextBase * RouteData -> bool, action: ControllerContext -> ActionResult) = 
+        let handler = FSharpMvcRouteHandler(action)
+        let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
+        this.Add({new RouteBase() with
+                    override this.GetRouteData ctx = 
+                        let data = RouteData(RouteHandler = handler, Route = this)
+                        for d in defaults do
+                            data.Values.Add(d.Key, d.Value)
+                        if routeConstraint (ctx, data)
+                            then data
+                            else null
+                    override this.GetVirtualPath(ctx, values) = null})
+
     member this.MapWithMethod(url, httpMethod, action: ControllerContext -> ActionResult) =
         let handler = FSharpMvcRouteHandler(action)
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         let httpMethodConstraint = HttpMethodConstraint([| httpMethod |])
         let constraints = RouteValueDictionary(dict [("httpMethod", httpMethodConstraint :> obj)])
-        let dataTokens = RouteValueDictionary()
-        this.Add(Route(url, defaults, constraints, dataTokens, handler))
+        this.Add(Route(url, defaults, constraints, handler))
 
     member this.MapPost(url, action: ControllerContext -> ActionResult) =  
         this.MapWithMethod(url, "POST", action)
 
-let action (routeConstraint: RouteConstraintParameters) = ()
+let action (routeConstraint: HttpContextBase * RouteData -> bool) (action: ControllerContext -> ActionResult) = 
+    RouteTable.Routes.MapAction(routeConstraint, action)
 
 let get url (action: ControllerContext -> ActionResult) =
     RouteTable.Routes.MapGet(url, action)
 
 let post url (action: ControllerContext -> ActionResult) =
     RouteTable.Routes.MapPost(url, action)
+
+(* Routing constraints *)
+let unconstrained (ctx: HttpContextBase, route: RouteData) = true
+
+let urlMatches (rx: Regex) (ctx: HttpContextBase, route: RouteData) =
+    if rx = null
+        then invalidArg "rx" "regex null"
+    rx.Matches ctx.Request.Url.AbsolutePath
