@@ -23,6 +23,7 @@ type MvcApplication() =
         post "action6" (bindForm postAction6Easier <@ postAction6Easier @>)
         get "inline" (fun _ -> content "<h1>Hello world!</h1>")
         //post "qsform" querystringAndForm |> contentAction |> 
+        action 
 
     member this.Application_Start() =
         this.RegisterRoutes RouteTable.Routes
