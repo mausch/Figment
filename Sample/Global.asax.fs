@@ -16,12 +16,13 @@ type MvcApplication() =
     member this.RegisterRoutes(routes: RouteCollection) = 
         routes.IgnoreRoute "asd"
         get "" action2
-        get "something" (action3 |> contentAction |> ignoreContext)
+        get "something" (action3 |> contentResult |> ignoreContext)
         get "action5" action5
         //get "action6" action6
         //post "action6" (formAction postAction6Easy)
         post "action6" (bindForm postAction6Easier <@ postAction6Easier @>)
         get "inline" (fun _ -> content "<h1>Hello world!</h1>")
+        //post "qsform" querystringAndForm |> contentAction |> 
 
     member this.Application_Start() =
         this.RegisterRoutes RouteTable.Routes

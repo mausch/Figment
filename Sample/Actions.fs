@@ -34,3 +34,7 @@ let postAction6Easy (form: NameValueCollection) =
 
 let postAction6Easier (somefield: string) =
     sprintf "posted %s" somefield |> content
+
+// how do I bind this?
+let querystringAndForm (form: NameValueCollection) (qs: NameValueCollection) = 
+    sprintf "form : %s<br/>querystring:%s" form.["formvalue"] qs.["qsvalue"]
