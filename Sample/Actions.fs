@@ -32,6 +32,5 @@ let action5 (ctx: ControllerContext) =
 let postAction6Easy (form: NameValueCollection) =
     content "<h1>posted action6</h1>"
 
-[<ReflectedDefinition>]
 let postAction6Easier (somefield: string) =
     sprintf "posted %s" somefield |> content
