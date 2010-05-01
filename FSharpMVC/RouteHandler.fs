@@ -21,9 +21,18 @@ type FSharpMvcRouteHandler(action: ControllerContext -> ActionResult) =
     interface IRouteHandler with
         member this.GetHttpHandler ctx = upcast FSharpMvcHandler(ctx, action)
 
-type FSharpMvcRouteConstraint(f: HttpContextBase * Route * string * RouteValueDictionary * RouteDirection -> bool) =
+type RouteConstraintParameters = {
+    Context: HttpContextBase
+    Route: Route
+    ParameterName: string
+    Values: RouteValueDictionary
+    Direction: RouteDirection
+}
+    
+type FSharpMvcRouteConstraint(f: RouteConstraintParameters -> bool) =
     interface IRouteConstraint with
-        member x.Match(ctx, route, parameterName, values, direction) = f(ctx, route, parameterName, values, direction)
+        member x.Match(ctx, route, parameterName, values, direction) = 
+            f {Context = ctx; Route = route; ParameterName = parameterName; Values = values; Direction = direction}
 
 type FSharpMvcSimpleRouteConstraint(f: HttpContextBase -> bool) =
     interface IRouteConstraint with

@@ -24,6 +24,8 @@ type RouteCollection with
     member this.MapPost(url, action: ControllerContext -> ActionResult) =  
         this.MapWithMethod(url, "POST", action)
 
+let action (routeConstraint: RouteConstraintParameters) = ()
+
 let get url (action: ControllerContext -> ActionResult) =
     RouteTable.Routes.MapGet(url, action)
 
