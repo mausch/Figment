@@ -45,6 +45,7 @@
     <Reference Include="System.Web.Routing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers.fs" />
     <Compile Include="RouteHandler.fs" />
     <Compile Include="Result.fs" />
     <Compile Include="Combinators.fs" />

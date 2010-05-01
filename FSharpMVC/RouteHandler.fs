@@ -6,10 +6,7 @@ open System.Web.Routing
 
 type FSharpMvcHandler(context: RequestContext, action: ControllerContext -> ActionResult) =
     member this.ProcessRequest(ctx: HttpContextBase) = 
-        let controller = { new Controller() with
-                            override this.ExecuteCore() = 
-                                let result = action this.ControllerContext
-                                result.ExecuteResult this.ControllerContext }
+        let controller = Helper.BuildControllerFromAction action
         (controller :> IController).Execute context
 
     interface IHttpHandler with
