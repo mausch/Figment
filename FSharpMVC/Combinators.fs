@@ -13,7 +13,7 @@ let contentAction (action: unit -> string) =
 let formAction (action: NameValueCollection -> ActionResult) =
     fun (ctx: ControllerContext) -> action ctx.HttpContext.Request.Form
 
-let bindForm (action: 'a -> ActionResult) (e: Expr<'a -> ActionResult>) = 
+let bindForm (action: 'a -> 'b) (e: Expr<'a -> 'b>) = 
     let pname = match e with
                 | Lambda(var, body) -> var.Name
                 | x -> failwithf "Expected lambda, actual %A" x
