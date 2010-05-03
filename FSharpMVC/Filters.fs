@@ -4,6 +4,7 @@ open System.Linq
 open System.Security.Principal
 open System.Web.Mvc
 open FSharpMvc.Result
+open FSharpMvc.Helpers
 
 let hasAuthorization (allowedUsers: string list) (allowedRoles: string list) (user: IPrincipal) =
     if not user.Identity.IsAuthenticated
@@ -19,3 +20,12 @@ let authorize (allowedUsers: string list) (allowedRoles: string list) (action: A
     if authorized 
         then action ctx
         else unauthorized
+
+let requireHttps (action: Action) (ctx: ControllerContext) = 
+    if ctx.HttpContext.Request.IsSecureConnection 
+        then action ctx
+        else
+            let request = ctx.HttpContext.Request
+            if request.HttpMethod <>. "GET"
+                then failwithf "HTTPS required for %s" request.RawUrl
+            redirect (sprintf "https://%s%s" request.Url.Host request.RawUrl)

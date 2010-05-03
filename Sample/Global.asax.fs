@@ -28,6 +28,6 @@ type MvcApplication() =
         //post "qsform" querystringAndForm |> contentAction |> 
         action unconstrained action5
         let authorizeForAdmin = authorize [] ["Admin"]
-        action (urlMatches "" &&. methodIsGet) (authorizeForAdmin action5)
+        action (urlMatches "" &&. methodIsGet) (action5 |> authorizeForAdmin |> requireHttps)
     
 
