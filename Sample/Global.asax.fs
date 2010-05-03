@@ -9,6 +9,7 @@ open FSharpMvc.Routing
 open FSharpMvc.RoutingConstraints
 open FSharpMvc.Combinators
 open FSharpMvc.Actions
+open FSharpMvc.Filters
 open Actions
 
 type MvcApplication() =
@@ -26,7 +27,7 @@ type MvcApplication() =
         get "" (view "viewname" ())
         //post "qsform" querystringAndForm |> contentAction |> 
         action unconstrained action5
-
-        action (urlMatches "" &&. methodIsGet) action5
+        let authorizeForAdmin = authorize [] ["Admin"]
+        action (urlMatches "" &&. methodIsGet) (authorizeForAdmin action5)
     
 
