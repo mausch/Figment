@@ -6,14 +6,14 @@ open System.Web.Routing
 open Combinators
 
 type RouteCollection with
-    member this.MapGet(url, action: ControllerContext -> ActionResult) =
+    member this.MapGet(url, action: Action) =
         this.MapWithMethod(url, "GET", action)
 
     member this.MapGet(url, action: unit -> string) =
         let c = action |> contentResult |> ignoreContext
         this.MapGet(url, c)
 
-    member this.MapAction(routeConstraint: RoutingConstraints.RouteConstraint, action: ControllerContext -> ActionResult) = 
+    member this.MapAction(routeConstraint: RoutingConstraints.RouteConstraint, action: Action) = 
         let handler = FSharpMvcRouteHandler(action)
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         this.Add({new RouteBase() with
@@ -26,22 +26,22 @@ type RouteCollection with
                             else null
                     override this.GetVirtualPath(ctx, values) = null})
 
-    member this.MapWithMethod(url, httpMethod, action: ControllerContext -> ActionResult) =
+    member this.MapWithMethod(url, httpMethod, action: Action) =
         let handler = FSharpMvcRouteHandler(action)
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         let httpMethodConstraint = HttpMethodConstraint([| httpMethod |])
         let constraints = RouteValueDictionary(dict [("httpMethod", httpMethodConstraint :> obj)])
         this.Add(Route(url, defaults, constraints, handler))
 
-    member this.MapPost(url, action: ControllerContext -> ActionResult) =  
+    member this.MapPost(url, action: Action) =  
         this.MapWithMethod(url, "POST", action)
 
-let action (routeConstraint: RoutingConstraints.RouteConstraint) (action: ControllerContext -> ActionResult) = 
+let action (routeConstraint: RoutingConstraints.RouteConstraint) (action: Action) = 
     RouteTable.Routes.MapAction(routeConstraint, action)
 
-let get url (action: ControllerContext -> ActionResult) =
+let get url (action: Action) =
     RouteTable.Routes.MapGet(url, action)
 
-let post url (action: ControllerContext -> ActionResult) =
+let post url (action: Action) =
     RouteTable.Routes.MapPost(url, action)
 
