@@ -16,7 +16,7 @@ let hasAuthorization (allowedUsers: string list) (allowedRoles: string list) (us
 
 let authorize (allowedUsers: string list) (allowedRoles: string list) (action: Action) (ctx: ControllerContext) = 
     let user = ctx.HttpContext.User
-    let authorized = hasAuthorization allowedUsers allowedRoles user
+    let authorized = user |> hasAuthorization allowedUsers allowedRoles
     if authorized 
         then action ctx
         else unauthorized
