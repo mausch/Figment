@@ -1,6 +1,5 @@
 ﻿module FSharpMvc.Routing
 
-open System.Text.RegularExpressions
 open System.Web
 open System.Web.Mvc
 open System.Web.Routing
@@ -14,7 +13,7 @@ type RouteCollection with
         let c = action |> contentResult |> ignoreContext
         this.MapGet(url, c)
 
-    member this.MapAction(routeConstraint: HttpContextBase * RouteData -> bool, action: ControllerContext -> ActionResult) = 
+    member this.MapAction(routeConstraint: RoutingConstraints.RouteConstraint, action: ControllerContext -> ActionResult) = 
         let handler = FSharpMvcRouteHandler(action)
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         this.Add({new RouteBase() with
@@ -37,7 +36,7 @@ type RouteCollection with
     member this.MapPost(url, action: ControllerContext -> ActionResult) =  
         this.MapWithMethod(url, "POST", action)
 
-let action (routeConstraint: HttpContextBase * RouteData -> bool) (action: ControllerContext -> ActionResult) = 
+let action (routeConstraint: RoutingConstraints.RouteConstraint) (action: ControllerContext -> ActionResult) = 
     RouteTable.Routes.MapAction(routeConstraint, action)
 
 let get url (action: ControllerContext -> ActionResult) =
@@ -46,10 +45,3 @@ let get url (action: ControllerContext -> ActionResult) =
 let post url (action: ControllerContext -> ActionResult) =
     RouteTable.Routes.MapPost(url, action)
 
-(* Routing constraints *)
-let unconstrained (ctx: HttpContextBase, route: RouteData) = true
-
-let urlMatches (rx: Regex) (ctx: HttpContextBase, route: RouteData) =
-    if rx = null
-        then invalidArg "rx" "regex null"
-    rx.Matches ctx.Request.Url.AbsolutePath

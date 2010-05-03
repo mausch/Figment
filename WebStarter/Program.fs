@@ -3,6 +3,15 @@ open System.IO
 open System.Diagnostics
 open System.Reflection
 
+type IntFun = int * int -> bool
+
+let (&&.) (fun1: IntFun) (fun2: IntFun) =
+    fun (a: int) (b: int) -> fun1(a,b) && fun2(a,b)
+
+let f1 (x,y) = x > y
+let f2 (x,y) = x = y
+let f3 = f1 &&. f2
+
 [<EntryPoint>]
 let main args =
     // code adapted from FSharp.PowerPack's AspNetTester
