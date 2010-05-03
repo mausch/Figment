@@ -26,3 +26,10 @@ let redirectToAction action =
     let handler = FSharpMvcRouteHandler(action) :> IRouteHandler
     let route = routes |> Seq.find (fun r -> r.RouteHandler = handler)
     redirect route.Url
+
+let unauthorized = HttpUnauthorizedResult() :> ActionResult
+
+let status code =
+    {new ActionResult() with
+        override x.ExecuteResult ctx =
+            ctx.HttpContext.Response.StatusCode <- code }
