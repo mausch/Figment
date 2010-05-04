@@ -4,7 +4,7 @@ open System.Web
 open System.Web.Mvc
 open System.Web.Routing
 
-type FSharpMvcHandler(context: RequestContext, action: Action) =
+type FSharpMvcHandler(context: RequestContext, action: MvcAction) =
     member this.ProcessRequest(ctx: HttpContextBase) = 
         let controller = Helper.BuildControllerFromAction action
         (controller :> IController).Execute context
@@ -14,7 +14,7 @@ type FSharpMvcHandler(context: RequestContext, action: Action) =
         member this.ProcessRequest ctx =
             this.ProcessRequest(HttpContextWrapper(ctx))
             
-type FSharpMvcRouteHandler(action: Action) =
+type FSharpMvcRouteHandler(action: MvcAction) =
     interface IRouteHandler with
         member this.GetHttpHandler ctx = upcast FSharpMvcHandler(ctx, action)
 

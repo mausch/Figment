@@ -50,9 +50,9 @@
     <Compile Include="Result.fs" />
     <Compile Include="Combinators.fs" />
     <Compile Include="Actions.fs" />
-    <Compile Include="Filters.fs" />
     <Compile Include="RoutingConstraints.fs" />
     <Compile Include="Routing.fs" />
+    <Compile Include="Filters.fs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\FSharp\1.0\Microsoft.FSharp.Targets" Condition="!Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />

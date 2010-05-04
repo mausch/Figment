@@ -4,10 +4,10 @@ open System
 open System.Web
 open System.Web.Mvc
 
-type Action = ControllerContext -> ActionResult
+type MvcAction = ControllerContext -> ActionResult
 
 type Helper() =
-    static member BuildControllerFromAction (action: Action) =
+    static member BuildControllerFromAction (action: MvcAction) =
         { new Controller() with
             override this.ExecuteCore() = 
                 let result = action this.ControllerContext
