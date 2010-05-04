@@ -5,7 +5,7 @@ open System.Reflection
 open System.Web
 open System.Web.Mvc
 open System.Web.Routing
-open Combinators
+open Binding
 open Helpers
 open Microsoft.FSharp.Metadata
 

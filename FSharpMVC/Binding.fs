@@ -1,4 +1,4 @@
-﻿module FSharpMvc.Combinators
+﻿module FSharpMvc.Binding
 
 open System
 open System.Web.Mvc

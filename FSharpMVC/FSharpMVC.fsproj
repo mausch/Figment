@@ -48,7 +48,7 @@
     <Compile Include="Helpers.fs" />
     <Compile Include="RouteHandler.fs" />
     <Compile Include="Result.fs" />
-    <Compile Include="Combinators.fs" />
+    <Compile Include="Binding.fs" />
     <Compile Include="Actions.fs" />
     <Compile Include="RoutingConstraints.fs" />
     <Compile Include="Routing.fs" />
