@@ -6,13 +6,6 @@ open System.Web.Routing
 open Combinators
 
 type RouteCollection with
-    member this.MapGet(url, action: Action) =
-        this.MapWithMethod(url, "GET", action)
-
-    member this.MapGet(url, action: unit -> string) =
-        let c = action |> contentResult |> ignoreContext
-        this.MapGet(url, c)
-
     member this.MapAction(routeConstraint: RoutingConstraints.RouteConstraint, action: Action) = 
         let handler = FSharpMvcRouteHandler(action)
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
@@ -32,6 +25,9 @@ type RouteCollection with
         let httpMethodConstraint = HttpMethodConstraint([| httpMethod |])
         let constraints = RouteValueDictionary(dict [("httpMethod", httpMethodConstraint :> obj)])
         this.Add(Route(url, defaults, constraints, handler))
+
+    member this.MapGet(url, action: Action) =
+        this.MapWithMethod(url, "GET", action)
 
     member this.MapPost(url, action: Action) =  
         this.MapWithMethod(url, "POST", action)
