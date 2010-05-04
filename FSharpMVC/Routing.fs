@@ -8,12 +8,13 @@ open System.Web.Routing
 open Binding
 open Helpers
 open Microsoft.FSharp.Metadata
+open RoutingConstraints
 
 
 let mutable registeredActions = List.empty<MvcAction * RouteBase>
 
 type RouteCollection with
-    member this.MapAction(routeConstraint: RoutingConstraints.RouteConstraint, action: MvcAction) = 
+    member this.MapAction(routeConstraint: RouteConstraint, action: MvcAction) = 
         let handler = FSharpMvcRouteHandler(action)
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         let route = {new RouteBase() with
@@ -43,7 +44,7 @@ type RouteCollection with
     member this.MapPost(url, action: MvcAction) =  
         this.MapWithMethod(url, "POST", action)
 
-let action (routeConstraint: RoutingConstraints.RouteConstraint) (action: MvcAction) = 
+let action (routeConstraint: RouteConstraint) (action: MvcAction) = 
     RouteTable.Routes.MapAction(routeConstraint, action)
 
 let get url (action: MvcAction) =
