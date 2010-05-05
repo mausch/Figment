@@ -15,7 +15,13 @@ type MvcApplication() =
     member this.Application_Start() = 
         get "hi" (content "<h1>Hello World!</h1>")
         get "showform" (view "action2viewname" ())
-        let action6Get (firstname: string) (lastname: string) = 
+        let action6Get (firstname: string) (lastname: string) (age: int) = 
             Result.content (sprintf "Hello %s %s" firstname lastname)
-        get "action6" (bind2 "firstname" "lastname" action6Get)
+        let b1 = bind "firstname" action6Get
+        let b1 b c a = b1 a b c
+        let b1 = bind "lastname" b1
+        let b1 b c a = b1 a b c
+        let b1 = bind "age" b1
+        let b1 a = b1 a a a
+        get "action6" b1
         ()

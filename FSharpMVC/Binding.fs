@@ -31,6 +31,14 @@ let bind2 (parameter1: string) (parameter2: string) (f: 'a -> 'b -> 'c) (ctx: Co
     let v2 = bindOne<'b> parameter2 ctx
     f v1 v2
 
+/// bind2 implemented on top of bind (instead of bindOne)
+let bind2alt (parameter1: string) (parameter2: string) (f: 'a -> 'b -> 'c) (ctx: ControllerContext) = 
+    let b1 = bind parameter1 f
+    let b1 b a = b1 a b
+    let b1 = bind parameter2 b1
+    let b1 b a = b1 a b
+    b1 ctx ctx
+
 let contentResult (action: 'a -> string) a =
     action a |> Result.content
 
