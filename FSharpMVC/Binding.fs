@@ -10,7 +10,7 @@ open Microsoft.FSharp.Quotations.Patterns
 let ignoreContext (action: unit -> 'a) (ctx: ControllerContext) =
     action()
 
-let bind (parameter: string) (f: 'a -> 'b) (ctx: ControllerContext) = 
+let bindOne<'a> (parameter: string) (ctx: ControllerContext) = 
     let binder = ModelBinders.Binders.GetBinder typeof<'a>
     let bindingContext = ModelBindingContext(
                             ModelName = parameter,
@@ -20,8 +20,16 @@ let bind (parameter: string) (f: 'a -> 'b) (ctx: ControllerContext) =
     let r = binder.BindModel(ctx, bindingContext)
     if not bindingContext.ModelState.IsValid
         then failwith "Binding failed"
-    f (r :?> 'a)
+    r :?> 'a
+    
+let bind (parameter: string) (f: 'a -> 'b) (ctx: ControllerContext) = 
+    let r = bindOne<'a> parameter ctx
+    f r
 
+let bind2 (parameter1: string) (parameter2: string) (f: 'a -> 'b -> 'c) (ctx: ControllerContext) = 
+    let v1 = bindOne<'a> parameter1 ctx
+    let v2 = bindOne<'b> parameter2 ctx
+    f v1 v2
 
 let contentResult (action: 'a -> string) a =
     action a |> Result.content
@@ -37,16 +45,8 @@ let bindForm (action: 'a -> 'b) (e: Expr<'a -> 'b>) (ctx: ControllerContext) =
                 | Lambda(var, body) -> var.Name
                 | x -> failwithf "Expected lambda, actual %A" x
 
-    let binder = ModelBinders.Binders.GetBinder typeof<'a>
-    let bindingContext = ModelBindingContext(
-                            ModelName = pname, 
-                            ModelState = ctx.Controller.ViewData.ModelState, 
-                            ModelMetadata = ModelMetadataProviders.Current.GetMetadataForType(null, typeof<'a>),
-                            ValueProvider = ctx.Controller.ValueProvider)
-    let r = binder.BindModel(ctx, bindingContext)
-    if not bindingContext.ModelState.IsValid
-        then failwith "Binding failed"
-    action (r :?> 'a)
+    let r = bindOne<'a> pname ctx
+    action r
 
 let bindFormToRecord (action: 'a -> 'b) =
     ()
