@@ -10,6 +10,19 @@ open Microsoft.FSharp.Quotations.Patterns
 let ignoreContext (action: unit -> 'a) (ctx: ControllerContext) =
     action()
 
+let bind (parameter: string) (f: 'a -> 'b) (ctx: ControllerContext) = 
+    let binder = ModelBinders.Binders.GetBinder typeof<'a>
+    let bindingContext = ModelBindingContext(
+                            ModelName = parameter,
+                            ModelState = ctx.Controller.ViewData.ModelState, 
+                            ModelMetadata = ModelMetadataProviders.Current.GetMetadataForType(null, typeof<'a>),
+                            ValueProvider = ctx.Controller.ValueProvider)
+    let r = binder.BindModel(ctx, bindingContext)
+    if not bindingContext.ModelState.IsValid
+        then failwith "Binding failed"
+    f (r :?> 'a)
+
+
 let contentResult (action: 'a -> string) a =
     action a |> Result.content
 
