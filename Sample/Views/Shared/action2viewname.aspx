@@ -8,5 +8,6 @@
 <form action="/action6" method="get">
 	<input name="firstname"/>
 	<input name="lastname"/>
+	<input name="age"/>
 	<input type="submit" value="GET"/>
 </form>
