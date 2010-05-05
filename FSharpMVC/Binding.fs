@@ -19,7 +19,7 @@ let bindOne<'a> (parameter: string) (ctx: ControllerContext) =
                             ValueProvider = ctx.Controller.ValueProvider)
     let r = binder.BindModel(ctx, bindingContext)
     if not bindingContext.ModelState.IsValid
-        then failwith "Binding failed"
+        then failwithf "Binding failed for model name %s, value provider %s" parameter (ctx.Controller.ValueProvider.GetType().Name)
     r :?> 'a
     
 let bind (parameter: string) (f: 'a -> 'b) (ctx: ControllerContext) = 
