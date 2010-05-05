@@ -4,6 +4,7 @@ open System
 open System.Web.Mvc
 open System.Globalization
 open System.Collections.Specialized
+open System.Text
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 
@@ -19,7 +20,20 @@ let bindOne<'a> (parameter: string) (ctx: ControllerContext) =
                             ValueProvider = ctx.Controller.ValueProvider)
     let r = binder.BindModel(ctx, bindingContext)
     if not bindingContext.ModelState.IsValid
-        then failwithf "Binding failed for model name %s, value provider %s" parameter (ctx.Controller.ValueProvider.GetType().Name)
+        then
+            let sb = StringBuilder()
+            sb.AppendLine (sprintf "Binding failed for model name '%s'" parameter) |> ignore
+            sb.AppendLine (sprintf "Model type: '%s'" typeof<'a>.FullName) |> ignore
+            let rawValue = ctx.Controller.ValueProvider.GetValue(parameter).RawValue
+            sb.AppendLine (sprintf "Actual value: '%A'" rawValue) |> ignore
+            let rawValueType = 
+                if rawValue = null 
+                    then "NULL" 
+                    else rawValue.GetType().FullName
+            sb.AppendLine (sprintf "Actual type: '%s'" rawValueType) |> ignore
+            sb.AppendLine (sprintf "Value provider: '%s'" (ctx.Controller.ValueProvider.GetType().Name)) |> ignore
+            failwith (sb.ToString())
+
     r :?> 'a
     
 let bind (parameter: string) (f: 'a -> 'b) (ctx: ControllerContext) = 
