@@ -7,6 +7,7 @@ open System.Collections.Specialized
 open System.Text
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
+open Printf
 
 let ignoreContext (action: unit -> 'a) (ctx: ControllerContext) =
     action()
@@ -22,16 +23,16 @@ let bindOne<'a> (parameter: string) (ctx: ControllerContext) =
     if not bindingContext.ModelState.IsValid
         then
             let sb = StringBuilder()
-            sb.AppendLine (sprintf "Binding failed for model name '%s'" parameter) |> ignore
-            sb.AppendLine (sprintf "Model type: '%s'" typeof<'a>.FullName) |> ignore
+            bprintf sb "Binding failed for model name '%s'" parameter
+            bprintf sb "Model type: '%s'" typeof<'a>.FullName
             let rawValue = ctx.Controller.ValueProvider.GetValue(parameter).RawValue
-            sb.AppendLine (sprintf "Actual value: '%A'" rawValue) |> ignore
+            bprintf sb "Actual value: '%A'" rawValue
             let rawValueType = 
                 if rawValue = null 
                     then "NULL" 
                     else rawValue.GetType().FullName
-            sb.AppendLine (sprintf "Actual type: '%s'" rawValueType) |> ignore
-            sb.AppendLine (sprintf "Value provider: '%s'" (ctx.Controller.ValueProvider.GetType().Name)) |> ignore
+            bprintf sb "Actual type: '%s'" rawValueType
+            bprintf sb "Value provider: '%s'" (ctx.Controller.ValueProvider.GetType().Name)
             failwith (sb.ToString())
 
     r :?> 'a
