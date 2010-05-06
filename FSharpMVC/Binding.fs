@@ -16,7 +16,7 @@ let ignoreContext (action: unit -> 'a) (ctx: ControllerContext) =
 let bindErrorThrow (parameter: string) (modelType: Type) (provider: IValueProvider) = 
     let sb = StringBuilder()
     bprintf sb "Binding failed for model name '%s'" parameter
-    bprintf sb "Model type: '%s'" typeof<'a>.FullName
+    bprintf sb "Model type: '%s'" modelType.FullName
     let rawValue = provider.GetValue(parameter).RawValue
     bprintf sb "Actual value: '%A'" rawValue
     let rawValueType = 
