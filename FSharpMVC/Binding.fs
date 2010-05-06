@@ -15,16 +15,16 @@ let ignoreContext (action: unit -> 'a) (ctx: ControllerContext) =
 /// handles a binding error by throwing
 let bindErrorThrow (parameter: string) (modelType: Type) (provider: IValueProvider) = 
     let sb = StringBuilder()
-    bprintf sb "Binding failed for model name '%s'" parameter
-    bprintf sb "Model type: '%s'" modelType.FullName
+    bprintf sb "Binding failed for model name '%s'\n" parameter
+    bprintf sb "Model type: '%s'\n" modelType.FullName
     let rawValue = provider.GetValue(parameter).RawValue
-    bprintf sb "Actual value: '%A'" rawValue
+    bprintf sb "Actual value: '%A'\n" rawValue
     let rawValueType = 
         if rawValue = null 
             then "NULL" 
             else rawValue.GetType().FullName
-    bprintf sb "Actual type: '%s'" rawValueType
-    bprintf sb "Value provider: '%s'" (provider.GetType().Name)
+    bprintf sb "Actual type: '%s'\n" rawValueType
+    bprintf sb "Value provider: '%s'\n" (provider.GetType().Name)
     failwith (sb.ToString())
 
 /// handles a binding error by returning a default value
