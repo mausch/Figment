@@ -12,30 +12,39 @@ open Printf
 let ignoreContext (action: unit -> 'a) (ctx: ControllerContext) =
     action()
 
-let bindOne<'a> (parameter: string) (ctx: ControllerContext) = 
+/// handles a binding error by throwing
+let bindErrorThrow (parameter: string) (modelType: Type) (provider: IValueProvider) = 
+    let sb = StringBuilder()
+    bprintf sb "Binding failed for model name '%s'" parameter
+    bprintf sb "Model type: '%s'" typeof<'a>.FullName
+    let rawValue = provider.GetValue(parameter).RawValue
+    bprintf sb "Actual value: '%A'" rawValue
+    let rawValueType = 
+        if rawValue = null 
+            then "NULL" 
+            else rawValue.GetType().FullName
+    bprintf sb "Actual type: '%s'" rawValueType
+    bprintf sb "Value provider: '%s'" (provider.GetType().Name)
+    failwith (sb.ToString())
+
+/// handles a binding error by returning a default value
+let bindErrorDefault defaultValue (parameter: string) (modelType: Type) (provider: IValueProvider) = 
+    defaultValue
+    
+let bindSingleParameter<'a> (parameter: string) (valueProvider: IValueProvider) (bindError: string -> Type -> IValueProvider -> 'a) (ctx: ControllerContext) = 
     let binder = ModelBinders.Binders.GetBinder typeof<'a>
     let bindingContext = ModelBindingContext(
                             ModelName = parameter,
                             ModelState = ctx.Controller.ViewData.ModelState, 
                             ModelMetadata = ModelMetadataProviders.Current.GetMetadataForType(null, typeof<'a>),
-                            ValueProvider = ctx.Controller.ValueProvider)
+                            ValueProvider = valueProvider)
     let r = binder.BindModel(ctx, bindingContext)
     if not bindingContext.ModelState.IsValid
-        then
-            let sb = StringBuilder()
-            bprintf sb "Binding failed for model name '%s'" parameter
-            bprintf sb "Model type: '%s'" typeof<'a>.FullName
-            let rawValue = ctx.Controller.ValueProvider.GetValue(parameter).RawValue
-            bprintf sb "Actual value: '%A'" rawValue
-            let rawValueType = 
-                if rawValue = null 
-                    then "NULL" 
-                    else rawValue.GetType().FullName
-            bprintf sb "Actual type: '%s'" rawValueType
-            bprintf sb "Value provider: '%s'" (ctx.Controller.ValueProvider.GetType().Name)
-            failwith (sb.ToString())
+        then bindError parameter typeof<'a> ctx.Controller.ValueProvider
+        else r :?> 'a    
 
-    r :?> 'a
+let bindOne<'a> (parameter: string) (ctx: ControllerContext) = 
+    bindSingleParameter<'a> parameter ctx.Controller.ValueProvider bindErrorThrow ctx
     
 let bind (parameter: string) (f: 'a -> 'b) (ctx: ControllerContext) = 
     let r = bindOne<'a> parameter ctx
