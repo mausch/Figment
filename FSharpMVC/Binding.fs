@@ -30,6 +30,9 @@ let bindErrorThrow (parameter: string) (modelType: Type) (provider: IValueProvid
 /// handles a binding error by returning a default value
 let bindErrorDefault defaultValue (parameter: string) (modelType: Type) (provider: IValueProvider) = 
     defaultValue
+
+let bindErrorDefaultOfType (parameter: string) (modelType: Type) (provider: IValueProvider) =
+    Helpers.defaultValueOf modelType
     
 let bindSingleParameter<'a> (parameter: string) (valueProvider: IValueProvider) (bindError: string -> Type -> IValueProvider -> 'a) (ctx: ControllerContext) = 
     let binder = ModelBinders.Binders.GetBinder typeof<'a>
