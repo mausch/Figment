@@ -50,6 +50,9 @@ let action (routeConstraint: RouteConstraint) (action: MvcAction) =
 let get url (action: MvcAction) =
     RouteTable.Routes.MapGet(url, action)
 
+let getS (fmt: PrintfFormat<'a, unit, unit, ActionResult>) (action: 'a) = 
+    ()
+
 let post url (action: MvcAction) =
     RouteTable.Routes.MapPost(url, action)
 

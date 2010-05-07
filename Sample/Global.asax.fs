@@ -13,6 +13,9 @@ type MvcApplication() =
     inherit HttpApplication()
 
     member this.Application_Start() = 
+        let bindInt (parameter: string) (f: int -> 'b) (ctx: ControllerContext) =
+            let r = bindSingleParameter parameter ctx.Controller.ValueProvider (bindErrorDefault 0) ctx
+            f r
         get "hi" (content "<h1>Hello World!</h1>")
         get "showform" (view "action2viewname" ())
         let action6Get (firstname: string) (lastname: string) (age: int) = 
@@ -21,8 +24,9 @@ type MvcApplication() =
         let b1 b c a = b1 a b c
         let b1 = bind "lastname" b1
         let b1 b c a = b1 a b c
-        let b1 = bind "age" b1
+        let b1 = bindInt "age" b1
         let b1 a = b1 a a a
         get "action6" b1
         get "route/{firstname}/{lastname}/{age}" b1
+        getS "route/{firstname:%s}/{lastname:%s}/{age:%d}" action6Get
         ()
