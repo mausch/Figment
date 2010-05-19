@@ -84,4 +84,13 @@ let bindForm (action: 'a -> 'b) (e: Expr<'a -> 'b>) (ctx: ControllerContext) =
     action r
 
 let bindFormToRecord (action: 'a -> 'b) =
+    // TODO
     ()
+
+let buildModelBinder f =
+    { new IModelBinder with
+        member this.BindModel(controllerContext, bindingContext) = f controllerContext bindingContext }
+
+type ModelBinderDictionary with
+    member this.Add(t: Type, f: ControllerContext -> ModelBindingContext -> obj) =
+        this.Add(t, buildModelBinder f)
