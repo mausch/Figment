@@ -31,26 +31,29 @@ type RouteCollection with
         this.Add(route)
         registeredActions <- (action, route)::registeredActions
 
-    member this.MapWithMethod(url, httpMethod, action: MvcAction) =
+    member this.MapWithMethod(url, routeName, httpMethod, action: MvcAction) =
         let handler = FSharpMvcRouteHandler(action)
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         let httpMethodConstraint = HttpMethodConstraint([| httpMethod |])
         let constraints = RouteValueDictionary(dict [("httpMethod", httpMethodConstraint :> obj)])
         let route = Route(url, defaults, constraints, handler)
-        this.Add(route)
+        this.Add(routeName, route)
         registeredActions <- (action, route :> RouteBase)::registeredActions
 
-    member this.MapGet(url, action: MvcAction) =
-        this.MapWithMethod(url, "GET", action)
+    member this.MapGet(url, routeName, action: MvcAction) =
+        this.MapWithMethod(url, routeName, "GET", action)
 
-    member this.MapPost(url, action: MvcAction) =  
-        this.MapWithMethod(url, "POST", action)
+    member this.MapPost(url, routeName, action: MvcAction) =  
+        this.MapWithMethod(url, routeName, "POST", action)
 
 let action (routeConstraint: RouteConstraint) (action: MvcAction) = 
     RouteTable.Routes.MapAction(routeConstraint, action)
 
 let get url (action: MvcAction) =
-    RouteTable.Routes.MapGet(url, action)
+    RouteTable.Routes.MapGet(url, null, action)
+
+let getN url routeName (action: MvcAction) =
+    RouteTable.Routes.MapGet(url, routeName, action)
 
 let stripFormatting s =
     let parameters = ref []
@@ -82,16 +85,19 @@ let rec bindAll (fTypes: Type list) (parameters: string list) (ctx: ControllerCo
         let v = bindSingleParameterNG hd (List.head parameters) ctx.Controller.ValueProvider ctx
         v::bindAll tl (List.tail parameters) ctx
 
-let getS (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) (action: 'a -> 'b) = 
+let getSN (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) routeName (action: 'a -> 'b) =
     let url, parameters = stripFormatting fmt.Value
     let args = FSharpType.GetFlattenedFunctionElements(action.GetType())
     let realAction ctx = 
         let values = bindAll args parameters ctx
         FSharpValue.InvokeFunction action values :?> ActionResult
-    get url realAction
+    getN url routeName realAction
+
+let getS (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) (action: 'a -> 'b) = 
+    getSN fmt null action
 
 let post url (action: MvcAction) =
-    RouteTable.Routes.MapPost(url, action)
+    RouteTable.Routes.MapPost(url, null, action)
 
 /// doesn't work yet
 let inThisAssembly(): MvcAction seq =
