@@ -1,6 +1,7 @@
 ﻿module FSharpMvc.Result
 
 open System.Linq
+open System.Web
 open System.Web.Mvc
 open System.Web.Routing
 
@@ -9,6 +10,11 @@ let empty = EmptyResult() :> ActionResult
 let view viewName model = 
     let viewData = ViewDataDictionary(Model = model)
     ViewResult(ViewData = viewData, ViewName = viewName) :> ActionResult
+
+let notFoundOrView viewName (model: 'a option) =    
+    match model with
+    | None -> raise <| HttpException(404, "Not found")
+    | Some x -> view viewName x
 
 let content s = 
     ContentResult(Content = s) :> ActionResult
