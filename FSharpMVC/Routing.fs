@@ -74,19 +74,21 @@ let (-!>) (domain: Type) (range: Type) =
 let (-->) (functionType: Type) (impl: obj -> obj) =
     FSharpValue.MakeFunction(functionType, impl)
 
-// action is 'a -> 'b -> ... -> ActionResult
-// return is ControllerContext -> ActionResult
-let rec bindAll (action: obj) (parameters: string list) (values: obj list) (ctx: ControllerContext) =
-    let domain, range = FSharpType.GetFunctionElements(action.GetType())
-    let v = bindSingleParameterNG domain (List.head parameters) ctx.Controller.ValueProvider ctx
-    let restAction = 
-        (typeof<ControllerContext> -!> range) --> 
-        fun ctx -> box ()
-    bindAll restAction (List.tail parameters) (v::values) ctx
+let rec bindAll (fTypes: Type list) (parameters: string list) (ctx: ControllerContext) =
+    match fTypes with
+    | [] -> failwith "no function types!"
+    | hd::[] -> []
+    | hd::tl -> 
+        let v = bindSingleParameterNG hd (List.head parameters) ctx.Controller.ValueProvider ctx
+        v::bindAll tl (List.tail parameters) ctx
 
-let getS (fmt: PrintfFormat<'a, unit, unit, ActionResult>) (action: 'a) = 
+let getS (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) (action: 'a -> 'b) = 
     let url, parameters = stripFormatting fmt.Value
-    get url (bindAll action parameters [])
+    let args = FSharpType.GetFlattenedFunctionElements(action.GetType())
+    let realAction ctx = 
+        let values = bindAll args parameters ctx
+        FSharpValue.InvokeFunction action values :?> ActionResult
+    get url realAction
 
 let post url (action: MvcAction) =
     RouteTable.Routes.MapPost(url, action)
