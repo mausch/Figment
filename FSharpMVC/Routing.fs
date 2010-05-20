@@ -8,6 +8,7 @@ open System.Web.Mvc
 open System.Web.Routing
 open Binding
 open Helpers
+open Extensions
 open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Metadata
 open RoutingConstraints
@@ -52,7 +53,15 @@ let get url (action: MvcAction) =
     RouteTable.Routes.MapGet(url, action)
 
 let stripFormatting s =
-    (Regex.Replace(s, ":%.*}", "}"), [])
+    let parameters = ref []
+    let eval (rxMatch: Match) = 
+        let name = rxMatch.Groups.Groups.[1].Value
+        if rxMatch.Groups.Groups.[2].Captures.Count > 0
+            then parameters := name::!parameters
+        sprintf "{%s}" name
+    let replace = Regex.Replace(s, "{([^:}]+)(:%[^}]+)?}", eval)
+    let parameters = List.rev !parameters
+    (replace, parameters)
 
 let functionInvoke f v (domain: Type) (range: Type) = 
     let fsFunc = typedefof<FSharpFunc<_,_>>.MakeGenericType [| domain; range |]
