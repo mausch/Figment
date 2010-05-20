@@ -33,6 +33,18 @@ let bindErrorDefault defaultValue (parameter: string) (modelType: Type) (provide
 
 let bindErrorDefaultOfType (parameter: string) (modelType: Type) (provider: IValueProvider) =
     Helpers.defaultValueOf modelType
+
+let bindSingleParameterNG (ty: Type) (parameter: string) (valueProvider: IValueProvider) (ctx: ControllerContext) =
+    let binder = ModelBinders.Binders.GetBinder ty
+    let bindingContext = ModelBindingContext(
+                            ModelName = parameter,
+                            ModelState = ctx.Controller.ViewData.ModelState, 
+                            ModelMetadata = ModelMetadataProviders.Current.GetMetadataForType(null, ty),
+                            ValueProvider = valueProvider)
+    let r = binder.BindModel(ctx, bindingContext)
+    if not bindingContext.ModelState.IsValid
+        then bindErrorThrow parameter ty ctx.Controller.ValueProvider
+        else r
     
 let bindSingleParameter<'a> (parameter: string) (valueProvider: IValueProvider) (bindError: string -> Type -> IValueProvider -> 'a) (ctx: ControllerContext) = 
     let binder = ModelBinders.Binders.GetBinder typeof<'a>

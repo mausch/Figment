@@ -2,14 +2,15 @@
 
 open System
 open System.Reflection
+open System.Text.RegularExpressions
 open System.Web
 open System.Web.Mvc
 open System.Web.Routing
 open Binding
 open Helpers
+open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Metadata
 open RoutingConstraints
-
 
 let mutable registeredActions = List.empty<MvcAction * RouteBase>
 
@@ -50,8 +51,33 @@ let action (routeConstraint: RouteConstraint) (action: MvcAction) =
 let get url (action: MvcAction) =
     RouteTable.Routes.MapGet(url, action)
 
+let stripFormatting s =
+    (Regex.Replace(s, ":%.*}", "}"), [])
+
+let functionInvoke f v (domain: Type) (range: Type) = 
+    let fsFunc = typedefof<FSharpFunc<_,_>>.MakeGenericType [| domain; range |]
+    let invokeMethod: MethodInfo = fsFunc.GetMethod("Invoke", [| domain |])
+    invokeMethod.Invoke(f, [| v |])
+
+let (-!>) (domain: Type) (range: Type) = 
+    FSharpType.MakeFunctionType(domain, range)
+
+let (-->) (functionType: Type) (impl: obj -> obj) =
+    FSharpValue.MakeFunction(functionType, impl)
+
+// action is 'a -> 'b -> ... -> ActionResult
+// return is ControllerContext -> ActionResult
+let rec bindAll (action: obj) (parameters: string list) (values: obj list) (ctx: ControllerContext) =
+    let domain, range = FSharpType.GetFunctionElements(action.GetType())
+    let v = bindSingleParameterNG domain (List.head parameters) ctx.Controller.ValueProvider ctx
+    let restAction = 
+        (typeof<ControllerContext> -!> range) --> 
+        fun ctx -> box ()
+    bindAll restAction (List.tail parameters) (v::values) ctx
+
 let getS (fmt: PrintfFormat<'a, unit, unit, ActionResult>) (action: 'a) = 
-    ()
+    let url, parameters = stripFormatting fmt.Value
+    get url (bindAll action parameters [])
 
 let post url (action: MvcAction) =
     RouteTable.Routes.MapPost(url, action)
