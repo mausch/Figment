@@ -35,3 +35,9 @@ let methodIs httpMethod (ctx: HttpContextBase, route: RouteData) =
 let methodIsGet x = methodIs "GET" x
 
 let methodIsPost x = methodIs "POST" x
+
+let userAgentMatches (rx: string) (ctx: HttpContextBase, route: RouteData) =
+    if rx = null
+        then invalidArg "rx" "regex null"
+    let rxx = Regex(rx)
+    rxx.IsMatch ctx.Request.UserAgent
