@@ -25,7 +25,7 @@ let redirect url =
     RedirectResult(url) :> ActionResult
 
 let redirectToRoute (routeValues: RouteValueDictionary) =
-    RedirectToRouteResult(routeValues)
+    RedirectToRouteResult(routeValues) :> ActionResult
 
 /// doesn't work, can't compare IRouteHandlers
 let redirectToAction action =    
