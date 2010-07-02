@@ -11,9 +11,11 @@ let view viewName model =
     let viewData = ViewDataDictionary(Model = model)
     ViewResult(ViewData = viewData, ViewName = viewName) :> ActionResult
 
+let notFound () = raise <| HttpException(404, "Not found")
+
 let notFoundOrView viewName (model: 'a option) =    
     match model with
-    | None -> raise <| HttpException(404, "Not found")
+    | None -> notFound()
     | Some x -> view viewName x
 
 let content s = 
