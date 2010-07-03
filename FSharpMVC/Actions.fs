@@ -12,3 +12,6 @@ let view str model (ctx: ControllerContext) =
     Result.view str model
 
 let empty (ctx: ControllerContext) = Result.empty
+
+let notFound (ctx: ControllerContext) = Result.notFound()
+    
