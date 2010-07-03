@@ -4,6 +4,7 @@ open System.Linq
 open System.Security.Principal
 open System.Web.Routing
 open System.Web.Mvc
+open System.Web.UI
 open FSharpMvc.Result
 open FSharpMvc.Helpers
 
@@ -23,6 +24,12 @@ let authorize (allowedUsers: string list) (allowedRoles: string list) (action: M
     if authorized 
         then action ctx
         else unauthorized
+
+let cache (settings: OutputCacheParameters) (action: MvcAction) (ctx: ControllerContext) : ActionResult = 
+    let cachePolicy = ctx.HttpContext.Response.Cache
+    cachePolicy.SetExpires(ctx.HttpContext.Timestamp.AddSeconds(float settings.Duration))
+    // TODO set the other cache parameters
+    action ctx
 
 let requireHttps (action: MvcAction) (ctx: ControllerContext) = 
     if ctx.HttpContext.Request.IsSecureConnection 

@@ -3,6 +3,7 @@
 open System
 open System.Web
 open System.Web.Mvc
+open System.Web.UI
 open FSharpMvc
 open FSharpMvc.Routing
 open FSharpMvc.RoutingConstraints
@@ -26,7 +27,8 @@ type MvcApplication() =
         let b1 b c a = b1 a b c
         let b1 = bindInt "age" b1
         let b1 a = b1 a a a
+        let cachedB1 = b1 |> Filters.cache (OutputCacheParameters(Duration = 60))
         get "action6" b1
-        get "route/{firstname}/{lastname}/{age}" b1
+        get "route/{firstname}/{lastname}/{age}" cachedB1
         getS "route/{firstname:%s}/{lastname:%s}/{age:%d}" action6Get
         ()
