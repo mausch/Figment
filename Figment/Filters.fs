@@ -40,6 +40,9 @@ let requireHttps (action: MvcAction) (ctx: ControllerContext) =
                 then failwithf "HTTPS required for %s" request.RawUrl
             redirect (sprintf "https://%s%s" request.Url.Host request.RawUrl)
 
+let apply (filter: Filter) (actions: seq<string * MvcAction>) =
+    actions |> Seq.map (fun (k,v) -> (k, filter v))
+
 let applyFilterToAllRegisteredActions (filter: Filter): unit = 
     let replaceHandler (route: RouteBase) (action: MvcAction) = 
         let handler = FigmentRouteHandler(action)
