@@ -47,13 +47,13 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="xunit">
-      <HintPath>C:\prg\FSharpMVC\lib\xunit.dll</HintPath>
+      <HintPath>..\lib\xunit.dll</HintPath>
     </Reference>
     <Reference Include="xunit.runner.tdnet">
-      <HintPath>C:\prg\FSharpMVC\lib\xunit.runner.tdnet.dll</HintPath>
+      <HintPath>..\lib\xunit.runner.tdnet.dll</HintPath>
     </Reference>
     <Reference Include="xunit.runner.utility">
-      <HintPath>C:\prg\FSharpMVC\lib\xunit.runner.utility.dll</HintPath>
+      <HintPath>..\lib\xunit.runner.utility.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
