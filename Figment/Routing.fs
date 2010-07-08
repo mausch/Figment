@@ -13,6 +13,8 @@ open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Metadata
 open RoutingConstraints
 
+type HttpMethod = GET | POST | HEAD | DELETE | PUT
+
 let mutable registeredActions = List.empty<MvcAction * RouteBase>
 
 type RouteCollection with
@@ -98,6 +100,12 @@ let getS (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) (action: 'a -> 
 
 let post url (action: MvcAction) =
     RouteTable.Routes.MapPost(url, null, action)
+
+let register (httpMethod: HttpMethod) url action =
+    match httpMethod with
+    | GET -> get url action
+    | POST -> post url action
+    | _ -> failwith "Not supported"
 
 /// doesn't work yet
 let inThisAssembly(): MvcAction seq =
