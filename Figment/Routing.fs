@@ -15,7 +15,7 @@ open RoutingConstraints
 
 type HttpMethod = GET | POST | HEAD | DELETE | PUT
 
-let mutable registeredActions = List.empty<MvcAction * RouteBase>
+let mutable registeredActions = List.empty<string * MvcAction * RouteBase>
 
 type RouteCollection with
     member this.MapAction(routeConstraint: RouteConstraint, action: MvcAction) = 
@@ -31,7 +31,8 @@ type RouteCollection with
                                 else null
                         override this.GetVirtualPath(ctx, values) = null}
         this.Add(route)
-        registeredActions <- (action, route)::registeredActions
+        let routeName = Guid.NewGuid().ToString()
+        registeredActions <- (routeName, action, route)::registeredActions
 
     member this.MapWithMethod(url, routeName, httpMethod, action: MvcAction) =
         let handler = FigmentRouteHandler(action)
@@ -40,7 +41,7 @@ type RouteCollection with
         let constraints = RouteValueDictionary(dict [("httpMethod", httpMethodConstraint :> obj)])
         let route = Route(url, defaults, constraints, handler)
         this.Add(routeName, route)
-        registeredActions <- (action, route :> RouteBase)::registeredActions
+        registeredActions <- (routeName, action, route :> RouteBase)::registeredActions
 
     member this.MapGet(url, routeName, action: MvcAction) =
         this.MapWithMethod(url, routeName, "GET", action)
@@ -106,6 +107,13 @@ let register (httpMethod: HttpMethod) url action =
     | GET -> get url action
     | POST -> post url action
     | _ -> failwith "Not supported"
+
+let remove routeName =
+    let _,_,route = registeredActions |> Seq.find (fun (name,_,_) -> name = routeName)
+    RouteTable.Routes.Remove route
+
+let clear () =
+    RouteTable.Routes.Clear()
 
 /// doesn't work yet
 let inThisAssembly(): MvcAction seq =
