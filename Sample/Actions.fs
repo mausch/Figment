@@ -4,7 +4,7 @@ open System.Web
 open System.Web.Mvc
 open System.Web.Routing
 open System.Collections.Specialized
-open FSharpMvc.Result
+open Figment.Result
 
 let action1 (ctx: ControllerContext) = empty
 

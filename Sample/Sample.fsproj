@@ -23,7 +23,7 @@
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Sample.XML</DocumentationFile>
     <StartAction>Program</StartAction>
-    <StartProgram>C:\prg\FSharpMVC\Sample\WebStarter.exe</StartProgram>
+    <StartProgram>C:\prg\Figment\Sample\WebStarter.exe</StartProgram>
     <StartWorkingDirectory>
     </StartWorkingDirectory>
     <StartArguments>
@@ -58,8 +58,8 @@
     <Reference Include="System.Web.Routing" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FSharpMVC\FSharpMVC.fsproj">
-      <Name>FSharpMVC</Name>
+    <ProjectReference Include="..\Figment\Figment.fsproj">
+      <Name>Figment</Name>
       <Project>{a080b979-6e39-44c4-ac1a-4850e32c355a}</Project>
       <Private>True</Private>
     </ProjectReference>

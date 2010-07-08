@@ -1,4 +1,4 @@
-﻿module FSharpMvc.Routing
+﻿module Figment.Routing
 
 open System
 open System.Reflection
@@ -17,7 +17,7 @@ let mutable registeredActions = List.empty<MvcAction * RouteBase>
 
 type RouteCollection with
     member this.MapAction(routeConstraint: RouteConstraint, action: MvcAction) = 
-        let handler = FSharpMvcRouteHandler(action)
+        let handler = FigmentRouteHandler(action)
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         let route = {new RouteBase() with
                         override this.GetRouteData ctx = 
@@ -32,7 +32,7 @@ type RouteCollection with
         registeredActions <- (action, route)::registeredActions
 
     member this.MapWithMethod(url, routeName, httpMethod, action: MvcAction) =
-        let handler = FSharpMvcRouteHandler(action)
+        let handler = FigmentRouteHandler(action)
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         let httpMethodConstraint = HttpMethodConstraint([| httpMethod |])
         let constraints = RouteValueDictionary(dict [("httpMethod", httpMethodConstraint :> obj)])

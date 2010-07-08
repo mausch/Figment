@@ -1,4 +1,4 @@
-﻿module FSharpMvc.Result
+﻿module Figment.Result
 
 open System.Linq
 open System.Web
@@ -31,7 +31,7 @@ let redirectToRoute (routeValues: RouteValueDictionary) =
 let redirectToAction action =    
     let routes = Enumerable.OfType<Route> RouteTable.Routes
     //let routes = RouteTable.Routes |> Enumerable.OfType
-    let handler = FSharpMvcRouteHandler(action) :> IRouteHandler
+    let handler = FigmentRouteHandler(action) :> IRouteHandler
     let route = routes |> Seq.find (fun r -> r.RouteHandler = handler)
     redirect route.Url
 

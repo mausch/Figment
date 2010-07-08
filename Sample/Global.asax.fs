@@ -4,11 +4,11 @@ open System
 open System.Web
 open System.Web.Mvc
 open System.Web.UI
-open FSharpMvc
-open FSharpMvc.Routing
-open FSharpMvc.RoutingConstraints
-open FSharpMvc.Actions
-open FSharpMvc.Binding
+open Figment
+open Figment.Routing
+open Figment.RoutingConstraints
+open Figment.Actions
+open Figment.Binding
 
 type MvcApplication() =
     inherit HttpApplication()

@@ -1,7 +1,7 @@
 ﻿module RoutingTests
 
 open Xunit
-open FSharpMvc.Routing
+open Figment.Routing
 
 [<Fact>]
 let stripFormattingTest() =

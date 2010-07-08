@@ -1,4 +1,4 @@
-﻿module FSharpMvc.Binding
+﻿module Figment.Binding
 
 open System
 open System.Web.Mvc

@@ -1,4 +1,4 @@
-﻿module FSharpMvc.RoutingConstraints
+﻿module Figment.RoutingConstraints
 
 open System.Linq
 open System.Text.RegularExpressions

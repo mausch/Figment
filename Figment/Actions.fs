@@ -1,4 +1,4 @@
-﻿module FSharpMvc.Actions
+﻿module Figment.Actions
 
 open System.Web.Mvc
 

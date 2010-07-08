@@ -1,4 +1,4 @@
-﻿namespace FSharpMvc
+﻿namespace Figment
 
 open System
 open System.Reflection

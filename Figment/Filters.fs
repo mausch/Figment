@@ -1,12 +1,12 @@
-﻿module FSharpMvc.Filters
+﻿module Figment.Filters
 
 open System.Linq
 open System.Security.Principal
 open System.Web.Routing
 open System.Web.Mvc
 open System.Web.UI
-open FSharpMvc.Result
-open FSharpMvc.Helpers
+open Figment.Result
+open Figment.Helpers
 
 type Filter = MvcAction -> MvcAction
 
@@ -42,7 +42,7 @@ let requireHttps (action: MvcAction) (ctx: ControllerContext) =
 
 let applyFilterToAllRegisteredActions (filter: Filter): unit = 
     let replaceHandler (route: RouteBase) (action: MvcAction) = 
-        let handler = FSharpMvcRouteHandler(action)
+        let handler = FigmentRouteHandler(action)
         {new RouteBase() with
             override this.GetVirtualPath(ctx, values) = route.GetVirtualPath(ctx, values)
             override this.GetRouteData ctx =

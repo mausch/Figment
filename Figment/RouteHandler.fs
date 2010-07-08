@@ -1,10 +1,10 @@
-﻿namespace FSharpMvc
+﻿namespace Figment
 
 open System.Web
 open System.Web.Mvc
 open System.Web.Routing
 
-type FSharpMvcHandler(context: RequestContext, action: MvcAction) =
+type FigmentHandler(context: RequestContext, action: MvcAction) =
     member this.ProcessRequest(ctx: HttpContextBase) = 
         let controller = Helper.BuildControllerFromAction action
         (controller :> IController).Execute context
@@ -14,9 +14,9 @@ type FSharpMvcHandler(context: RequestContext, action: MvcAction) =
         member this.ProcessRequest ctx =
             this.ProcessRequest(HttpContextWrapper(ctx))
             
-type FSharpMvcRouteHandler(action: MvcAction) =
+type FigmentRouteHandler(action: MvcAction) =
     interface IRouteHandler with
-        member this.GetHttpHandler ctx = upcast FSharpMvcHandler(ctx, action)
+        member this.GetHttpHandler ctx = upcast FigmentHandler(ctx, action)
 
 type RouteConstraintParameters = {
     Context: HttpContextBase
@@ -26,22 +26,22 @@ type RouteConstraintParameters = {
     Direction: RouteDirection
 }
     
-type FSharpMvcRouteConstraint(f: RouteConstraintParameters -> bool) =
+type FigmentRouteConstraint(f: RouteConstraintParameters -> bool) =
     interface IRouteConstraint with
         member x.Match(ctx, route, parameterName, values, direction) = 
             f {Context = ctx; Route = route; ParameterName = parameterName; Values = values; Direction = direction}
 
-type FSharpMvcSimpleRouteConstraint(f: HttpContextBase -> bool) =
+type FigmentSimpleRouteConstraint(f: HttpContextBase -> bool) =
     interface IRouteConstraint with
         member x.Match(ctx, route, parameterName, values, direction) = f ctx
 
 (*
-type FSharpMvcRoute(action: ControllerContext -> ActionResult, acceptRoute: HttpContextBase -> bool) =
+type FigmentRoute(action: ControllerContext -> ActionResult, acceptRoute: HttpContextBase -> bool) =
     inherit RouteBase()
 
     override this.GetRouteData ctx = 
         if acceptRoute ctx
-            then RouteData(this, FSharpMvcRouteHandler(action))
+            then RouteData(this, FigmentRouteHandler(action))
             else null
 
     override this.GetVirtualPath (ctx, routeValues) = null
