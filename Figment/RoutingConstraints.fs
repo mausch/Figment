@@ -18,6 +18,9 @@ let (||.) (x: RouteConstraint) (y: RouteConstraint) = anyOf [x;y]
 
 let (&&.) (x: RouteConstraint) (y: RouteConstraint) = allOf [x;y]
 
+let (!.) (x: RouteConstraint) (ctx: HttpContextBase, route: RouteData) = 
+    not (x(ctx, route))
+
 (* constraints *)
 let unconstrained (ctx: HttpContextBase, route: RouteData) = true
 
