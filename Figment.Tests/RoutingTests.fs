@@ -1,7 +1,11 @@
 ﻿module RoutingTests
 
+open System
+open System.Web
+open System.Web.Routing
 open Xunit
 open Figment.Routing
+open Figment.RoutingConstraints
 
 [<Fact>]
 let stripFormattingTest() =
@@ -16,4 +20,14 @@ let stripFormattingTest() =
     Assert.Equal("id", parameters.[0])
     Assert.Equal("title", parameters.[1])
 
+    ()
+
+[<Fact>]
+let urlMatchesTest() =
+    let ctx = {new HttpContextBase() with
+                override x.Request = {new HttpRequestBase() with
+                    override x.Url = Uri("http://localhost/something")}}
+    let route = RouteData()
+    Assert.True(ifUrlMatches "^/some" (ctx, route))
+    Assert.False(ifUrlMatches "^/some$" (ctx, route))
     ()
