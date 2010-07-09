@@ -15,10 +15,10 @@ open RoutingConstraints
 
 type HttpMethod = GET | POST | HEAD | DELETE | PUT
 
-let mutable registeredActions = List.empty<string * MvcAction * RouteBase>
+let mutable registeredActions = List.empty<string * FAction * RouteBase>
 
 type RouteCollection with
-    member this.MapAction(routeConstraint: RouteConstraint, action: MvcAction) = 
+    member this.MapAction(routeConstraint: RouteConstraint, action: FAction) = 
         let handler = FigmentRouteHandler(action)
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         let route = {new RouteBase() with
@@ -34,7 +34,7 @@ type RouteCollection with
         let routeName = Guid.NewGuid().ToString()
         registeredActions <- (routeName, action, route)::registeredActions
 
-    member this.MapWithMethod(url, routeName, httpMethod, action: MvcAction) =
+    member this.MapWithMethod(url, routeName, httpMethod, action: FAction) =
         let handler = FigmentRouteHandler(action)
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         let httpMethodConstraint = HttpMethodConstraint([| httpMethod |])
@@ -43,19 +43,19 @@ type RouteCollection with
         this.Add(routeName, route)
         registeredActions <- (routeName, action, route :> RouteBase)::registeredActions
 
-    member this.MapGet(url, routeName, action: MvcAction) =
+    member this.MapGet(url, routeName, action: FAction) =
         this.MapWithMethod(url, routeName, "GET", action)
 
-    member this.MapPost(url, routeName, action: MvcAction) =  
+    member this.MapPost(url, routeName, action: FAction) =  
         this.MapWithMethod(url, routeName, "POST", action)
 
-let action (routeConstraint: RouteConstraint) (action: MvcAction) = 
+let action (routeConstraint: RouteConstraint) (action: FAction) = 
     RouteTable.Routes.MapAction(routeConstraint, action)
 
-let get url (action: MvcAction) =
+let get url (action: FAction) =
     RouteTable.Routes.MapGet(url, null, action)
 
-let getN url routeName (action: MvcAction) =
+let getN url routeName (action: FAction) =
     RouteTable.Routes.MapGet(url, routeName, action)
 
 let stripFormatting s =
@@ -99,7 +99,7 @@ let getSN (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) routeName (act
 let getS (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) (action: 'a -> 'b) = 
     getSN fmt null action
 
-let post url (action: MvcAction) =
+let post url (action: FAction) =
     RouteTable.Routes.MapPost(url, null, action)
 
 let register (httpMethod: HttpMethod) url action =
@@ -116,7 +116,7 @@ let clear () =
     RouteTable.Routes.Clear()
 
 /// doesn't work yet
-let inThisAssembly(): MvcAction seq =
+let inThisAssembly(): FAction seq =
     let entities = 
         let topLevelEntities = 
             (FSharpAssembly.FromAssembly (Assembly.GetCallingAssembly())).Entities
@@ -130,10 +130,10 @@ let inThisAssembly(): MvcAction seq =
     let values = entities |> Seq.collect (fun e -> e.MembersOrValues)
     let functions = values |> Seq.filter (fun v -> v.Type.IsFunction)
     let names = functions |> Seq.map (fun f -> f.CompiledName) |> Seq.toList
-    [Actions.empty] :> seq<MvcAction>
+    [Actions.empty] :> seq<FAction>
 
 /// not implemented
-let registerAllWithAttribute (attr: #Attribute) (actions: unit -> MvcAction seq) = 
+let registerAllWithAttribute (attr: #Attribute) (actions: unit -> FAction seq) = 
     let t = actions()
     raise <| NotImplementedException()
     ()

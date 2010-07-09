@@ -4,7 +4,7 @@ open System.Web
 open System.Web.Mvc
 open System.Web.Routing
 
-type FigmentHandler(context: RequestContext, action: MvcAction) =
+type FigmentHandler(context: RequestContext, action: FAction) =
     member this.ProcessRequest(ctx: HttpContextBase) = 
         let controller = Helper.BuildControllerFromAction action
         (controller :> IController).Execute context
@@ -14,7 +14,7 @@ type FigmentHandler(context: RequestContext, action: MvcAction) =
         member this.ProcessRequest ctx =
             this.ProcessRequest(HttpContextWrapper(ctx))
             
-type FigmentRouteHandler(action: MvcAction) =
+type FigmentRouteHandler(action: FAction) =
     interface IRouteHandler with
         member this.GetHttpHandler ctx = upcast FigmentHandler(ctx, action)
 

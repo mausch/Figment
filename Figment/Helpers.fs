@@ -5,7 +5,7 @@ open System.Reflection
 open System.Web
 open System.Web.Mvc
 
-type MvcAction = ControllerContext -> ActionResult
+type FAction = ControllerContext -> ActionResult
 
 type ControllerFilters = {
     actionExecutedFilter: ActionExecutedContext -> unit
@@ -16,7 +16,7 @@ type ControllerFilters = {
     resultExecutingFilter: ResultExecutingContext -> unit
 }
 
-type FSharpController(action: MvcAction, filters: ControllerFilters) =
+type FSharpController(action: FAction, filters: ControllerFilters) =
     inherit Controller() with
         override this.OnActionExecuted ctx = filters.actionExecutedFilter ctx
         override this.OnActionExecuting ctx = filters.actionExecutingFilter ctx
@@ -29,7 +29,7 @@ type FSharpController(action: MvcAction, filters: ControllerFilters) =
             result.ExecuteResult this.ControllerContext
 
 type Helper() =
-    static member BuildControllerFromAction (action: MvcAction) =
+    static member BuildControllerFromAction (action: FAction) =
         { new Controller() with
             override this.ExecuteCore() = 
                 let result = action this.ControllerContext
