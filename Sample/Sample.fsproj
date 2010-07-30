@@ -47,6 +47,12 @@
     <Compile Include="Global.asax.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FParsec">
+      <HintPath>..\lib\FParsec.dll</HintPath>
+    </Reference>
+    <Reference Include="FParsecCS">
+      <HintPath>..\lib\FParsecCS.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core" />
     <Reference Include="System" />
@@ -56,6 +62,16 @@
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Mvc, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WingBeats">
+      <HintPath>..\lib\WingBeats.dll</HintPath>
+    </Reference>
+    <Reference Include="WingBeats.Mvc">
+      <HintPath>..\lib\WingBeats.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="WingBeats.Xhtml">
+      <HintPath>..\lib\WingBeats.Xhtml.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Figment\Figment.fsproj">
