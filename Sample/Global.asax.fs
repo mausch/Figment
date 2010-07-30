@@ -16,8 +16,6 @@ open WingBeats.Xml
 type MvcApplication() =
     inherit HttpApplication()
 
-    let wbview (n: Node) (ctx: ControllerContext) = 
-        Result.content <| Renderer.RenderToString n
 
     member this.Application_Start() = 
         //ViewEngines.Engines.Clear();
