@@ -32,11 +32,16 @@ type MvcApplication() =
         getS "route/{firstname:%s}/{lastname:%s}/{age:%d}" nameAndAge
 
         let e = XhtmlElement()
-        let r = e.Html [
-                    e.Body [
-                        e.H1 [ &"Hello World from Wing Beats" ]
-                    ]
+        let wbpage title = 
+            e.Html [
+                e.Head [
+                    e.Title [ &title ]
                 ]
-        get "wingbeats" (wbview r)
+                e.Body [
+                    e.H1 [ &title ]
+                    //e.A [("href", ""); &title]
+                ]
+            ]
+        get "wingbeats" ((wbpage >> wbview) "Hello World from Wing Beats")
 
         ()
