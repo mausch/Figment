@@ -15,7 +15,15 @@ open RoutingConstraints
 
 type HttpMethod = GET | POST | HEAD | DELETE | PUT
 
-let mutable registeredActions = List.empty<string * FAction * RouteBase>
+type ActionRegistration = {
+    routeName: string
+    action: FAction
+    route: RouteBase
+} with
+    static member make(routeName, action, route) = 
+        {routeName = routeName; action = action; route = route}
+
+let mutable registeredActions = List.empty<ActionRegistration>
 
 type RouteCollection with
     member this.MapAction(routeConstraint: RouteConstraint, action: FAction) = 
@@ -32,7 +40,7 @@ type RouteCollection with
                         override this.GetVirtualPath(ctx, values) = null}
         this.Add(route)
         let routeName = Guid.NewGuid().ToString()
-        registeredActions <- (routeName, action, route)::registeredActions
+        registeredActions <- ActionRegistration.make(routeName, action, route)::registeredActions
 
     member this.MapWithMethod(url, routeName, httpMethod, action: FAction) =
         let handler = FigmentRouteHandler(action)
@@ -41,7 +49,7 @@ type RouteCollection with
         let constraints = RouteValueDictionary(dict [("httpMethod", httpMethodConstraint :> obj)])
         let route = Route(url, defaults, constraints, handler)
         this.Add(routeName, route)
-        registeredActions <- (routeName, action, route :> RouteBase)::registeredActions
+        registeredActions <- ActionRegistration.make(routeName, action, route)::registeredActions
 
     member this.MapGet(url, routeName, action: FAction) =
         this.MapWithMethod(url, routeName, "GET", action)
@@ -109,8 +117,8 @@ let register (httpMethod: HttpMethod) url action =
     | _ -> failwith "Not supported"
 
 let remove routeName =
-    let _,_,route = registeredActions |> Seq.find (fun (name,_,_) -> name = routeName)
-    RouteTable.Routes.Remove route
+    let reg = registeredActions |> Seq.find (fun r -> r.routeName = routeName)
+    RouteTable.Routes.Remove reg.route
 
 let clear () =
     RouteTable.Routes.Clear()
