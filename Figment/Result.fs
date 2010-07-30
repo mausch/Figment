@@ -41,3 +41,9 @@ let status code =
     {new ActionResult() with
         override x.ExecuteResult ctx =
             ctx.HttpContext.Response.StatusCode <- code }
+
+let file contentType stream =
+    FileStreamResult(stream, contentType) :> ActionResult
+
+let json data =
+    JsonResult(Data = data) :> ActionResult
