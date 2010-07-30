@@ -5,7 +5,9 @@ open System.Web.Mvc
 
 module Result =
     let wbview (n: Node) =
-        Result.content (Renderer.RenderToString n)
+        {new ActionResult() with
+            override x.ExecuteResult ctx =
+                Renderer.Render(n, ctx.HttpContext.Response.Output) }
 
 module Actions =
     let wbview (n: Node) (ctx: ControllerContext) =
