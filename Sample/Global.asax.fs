@@ -41,7 +41,7 @@ type MvcApplication() =
         let greet name = sprintf "Hello %s" name
         // binding to request
         let greet' (ctx: ControllerContext) = 
-            let boundGreet = (greet >> sprintf "<h1>%s</h1>" >> Result.content) 
+            let boundGreet = greet >> sprintf "<h1>%s</h1>" >> Result.content
             boundGreet ctx.HttpContext.Request.["somefield"]
         post "action6" greet'
 
