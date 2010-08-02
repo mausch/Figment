@@ -84,7 +84,7 @@ let contentResult (action: 'a -> string) a =
 let formAction (action: NameValueCollection -> 'a) (ctx: ControllerContext) =
     action ctx.HttpContext.Request.Form
 
-let querystringAction (action: NameValueCollection -> 'a) (ctx: ControllerContext) = 
+let bindQuerystring (action: NameValueCollection -> 'a) (ctx: ControllerContext) = 
     action ctx.HttpContext.Request.QueryString
 
 let bindForm (action: 'a -> 'b) (e: Expr<'a -> 'b>) (ctx: ControllerContext) = 

@@ -1,6 +1,7 @@
 ﻿namespace SampleApp
 
 open System
+open System.Collections.Specialized
 open System.Web
 open System.Web.Mvc
 open System.Web.UI
@@ -55,6 +56,10 @@ type MvcApplication() =
             greet req.["firstname"] req.["lastname"] (int req.["age"])
             |> sprintf "<p>%s</p>" |> Result.content
         get "action6" greet'
+
+        let greet' (p: NameValueCollection) = 
+            greet p.["firstname"] p.["lastname"] (int p.["age"])
+        get "greetme2" (bindQuerystring greet' >> Result.view "someview")
 
         // strongly-typed route+binding
         let nameAndAge (firstname: string) (lastname: string) (age: int) = 
