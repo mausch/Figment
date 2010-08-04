@@ -8,6 +8,7 @@ open System.Web.UI
 open Figment
 open Figment.Routing
 open Figment.RoutingConstraints
+open Figment.Result
 open Figment.Actions
 open Figment.Binding
 open Figment.Filters
@@ -62,7 +63,7 @@ type MvcApplication() =
         get "greetme2" (bindQuerystring greet' >> Result.view "someview")
 
         // strongly-typed route+binding
-        let nameAndAge (firstname: string) (lastname: string) (age: int) = 
+        let nameAndAge firstname lastname age = 
             sprintf "Hello %s %s, %d years old" firstname lastname age
             |> Result.content
         getS "route/{firstname:%s}/{lastname:%s}/{age:%d}" nameAndAge
@@ -89,5 +90,7 @@ type MvcApplication() =
             (wbpageview "You're NOT using Internet Explorer")
 
         action ifGetDsl (wbpageview "You're using Internet Explorer")
+
+        action unconstrained (status 404 => content "<h1>Not found!</h1>")
 
         ()

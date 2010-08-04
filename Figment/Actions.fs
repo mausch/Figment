@@ -2,6 +2,16 @@
 
 open System.Web.Mvc
 
+// operators
+let concat (a: FAction) (b: FAction) (ctx: ControllerContext) =
+    let x = a ctx
+    let y = b ctx
+    Result.concat x y
+
+let (=>) = concat
+
+// actions
+
 let content str (ctx: ControllerContext) = 
     Result.content str
 
@@ -15,3 +25,5 @@ let empty (ctx: ControllerContext) = Result.empty
 
 let notFound (ctx: ControllerContext) = Result.notFound()
     
+let status code (ctx: ControllerContext) =
+    Result.status code

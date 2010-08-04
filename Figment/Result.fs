@@ -5,6 +5,14 @@ open System.Web
 open System.Web.Mvc
 open System.Web.Routing
 
+let concat (a: ActionResult) (b: ActionResult) =
+    {new ActionResult() with
+        override x.ExecuteResult ctx =
+            a.ExecuteResult ctx
+            b.ExecuteResult ctx }    
+
+let (>>.) = concat
+
 let empty = EmptyResult() :> ActionResult
 
 let view viewName model = 
