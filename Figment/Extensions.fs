@@ -1,7 +1,8 @@
-﻿module Extensions
+﻿module Figment.Extensions
 
 open System
 open System.Reflection
+open System.Web.Mvc
 open Microsoft.FSharp.Reflection
 open System.Text.RegularExpressions
 
@@ -36,3 +37,7 @@ type FSharpValue with
         if not (FSharpType.IsFunction(r.GetType()))
             then box r
             else FSharpValue.InvokeFunction r (List.tail args)
+
+
+type ControllerContext with
+    member x.UrlHelper with get() = UrlHelper(x.RequestContext)
