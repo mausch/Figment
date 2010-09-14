@@ -24,23 +24,26 @@ let (!.) (x: RouteConstraint) (ctx: HttpContextBase, route: RouteData) =
 (* constraints *)
 let unconstrained (ctx: HttpContextBase, route: RouteData) = true
 
-let ifUrlMatches (rx: string) (ctx: HttpContextBase, route: RouteData) =
+let ifUrlMatches (rx: string) =
     if rx = null
         then invalidArg "rx" "regex null"
     let rxx = Regex(rx)
-    rxx.IsMatch ctx.Request.Url.AbsolutePath
+    fun (ctx: HttpContextBase, route: RouteData) ->
+        rxx.IsMatch ctx.Request.Url.AbsolutePath
 
-let ifMethodIs httpMethod (ctx: HttpContextBase, route: RouteData) = 
+let ifMethodIs httpMethod = 
     if httpMethod = null
         then invalidArg "httpMethod" "httpMethod null"
-    ctx.Request.HttpMethod = httpMethod
+    fun (ctx: HttpContextBase, route: RouteData) -> 
+        ctx.Request.HttpMethod = httpMethod
 
 let ifMethodIsGet x = ifMethodIs "GET" x
 
 let ifMethodIsPost x = ifMethodIs "POST" x
 
-let ifUserAgentMatches (rx: string) (ctx: HttpContextBase, route: RouteData) =
+let ifUserAgentMatches (rx: string) =
     if rx = null
         then invalidArg "rx" "regex null"
     let rxx = Regex(rx)
-    rxx.IsMatch ctx.Request.UserAgent
+    fun (ctx: HttpContextBase, route: RouteData) ->
+        rxx.IsMatch ctx.Request.UserAgent
