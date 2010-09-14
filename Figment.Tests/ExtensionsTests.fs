@@ -2,7 +2,7 @@
 
 open Xunit
 open Microsoft.FSharp.Reflection
-open Extensions
+open Figment.Extensions
 
 [<Fact>]
 let InvokeFunctionTests() =
