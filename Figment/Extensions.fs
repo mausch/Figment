@@ -5,6 +5,7 @@ open System.Reflection
 open System.Web.Mvc
 open Microsoft.FSharp.Reflection
 open System.Text.RegularExpressions
+open System.Web.Caching
 
 type CaptureCollection with
     member this.Captures 
@@ -41,3 +42,21 @@ type FSharpValue with
 
 type ControllerContext with
     member x.UrlHelper with get() = UrlHelper(x.RequestContext)
+    member x.Cache with get() = x.HttpContext.Cache
+
+type Cache with
+    member x.GetOrAdd(key: string, valueFactory: string -> 'a, ?dependencies, ?absoluteExpiration, ?slidingExpiration, ?priority, ?onRemoveCallback): 'a = 
+        let item = x.Get(key)
+        if item <> null then
+            unbox item
+        else
+            let dependencies = defaultArg dependencies null
+            let absoluteExpiration = defaultArg absoluteExpiration Cache.NoAbsoluteExpiration
+            let slidingExpiration = defaultArg slidingExpiration Cache.NoSlidingExpiration
+            let priority = defaultArg priority CacheItemPriority.Default
+            let onRemoveCallback = defaultArg onRemoveCallback (fun _ _ _ -> ())
+            let onRemoveCallback = CacheItemRemovedCallback(onRemoveCallback)
+            let value = valueFactory key
+            x.Add(key, value, dependencies, absoluteExpiration, slidingExpiration, priority, onRemoveCallback) |> ignore
+            value
+            
