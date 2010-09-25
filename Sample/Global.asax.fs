@@ -16,6 +16,8 @@ open Figment.Filters
 open WingBeats.Xhtml
 open WingBeats.Xml
 
+open System.Diagnostics
+
 type PersonalInfo = {
     firstName: string
     lastName: string
@@ -93,13 +95,15 @@ type MvcApplication() =
         action ifGetDsl (wbpageview "You're using Internet Explorer")
 
         let someasync (ctx: ControllerContext) = async {
-            let url = ctx.HttpContext.Request.RawUrl
-            let url = HttpUtility.UrlEncode url
+            Debug.WriteLine "Start async action"
+            let query = ctx.HttpContext.Request.Url.Segments.[2]
+            let query = HttpUtility.UrlEncode query
             use web = new WebClient()
-            let! content = web.AsyncDownloadString(Uri("http://www.google.com/search?q=" + url))
+            let! content = web.AsyncDownloadString(Uri("http://www.google.com/search?q=" + query))
+            Debug.WriteLine "got google response"
             return Result.content content
         }
-        asyncAction (ifUrlMatches "^/google") someasync
+        asyncAction (ifUrlMatches "^/google/") someasync
 
         action unconstrained (status 404 => content "<h1>Not found!</h1>")
 

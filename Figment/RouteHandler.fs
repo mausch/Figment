@@ -1,10 +1,13 @@
 ﻿namespace Figment
 
+open System
 open System.Web
 open System.Web.Mvc
 open System.Web.Mvc.Async
 open System.Web.Routing
 open Figment.Helpers
+
+open System.Diagnostics
 
 type FigmentHandler(context: RequestContext, action: FAction) =
     member this.ProcessRequest(ctx: HttpContextBase) = 
@@ -25,11 +28,13 @@ type FigmentAsyncHandler(context: RequestContext, action: FAsyncAction) =
         member this.IsReusable with get() = false
         member this.ProcessRequest ctx =
             this.ProcessRequest(HttpContextWrapper(ctx))
-        member this.BeginProcessRequest(ctx, cb, data) = 
-            let controller = Helper.BuildControllerFromAsyncAction action
-            (controller :> IAsyncController).BeginExecute(context, cb, data)
+        member this.BeginProcessRequest(ctx, cb, state) = 
+            Debug.WriteLine "BeginProcessRequest"
+            let controller = Helper.BuildControllerFromAsyncAction action :> IAsyncController
+            controller.BeginExecute(context, cb, state)
 
-        member this.EndProcessRequest r = ()
+        member this.EndProcessRequest r =
+            Debug.WriteLine "EndProcessRequest"
             
 type FigmentRouteHandler(action: FAction) =
     interface IRouteHandler with

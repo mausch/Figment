@@ -4,6 +4,9 @@ open System
 open System.Reflection
 open System.Web
 open System.Web.Mvc
+open System.Web.Mvc.Async
+
+open System.Diagnostics
 
 type FAction = ControllerContext -> ActionResult
 
@@ -41,20 +44,27 @@ type FSharpController(action: FAction, filters: ControllerFilters) =
             result.ExecuteResult this.ControllerContext
 
 type FSharpAsyncController(action: FAsyncAction, filters: ControllerFilters) = 
-    inherit AsyncController() with
-        let abegin, aend, acancel = Async.AsBeginEnd action
-        override this.OnActionExecuted ctx = filters.actionExecutedFilter ctx
-        override this.OnActionExecuting ctx = filters.actionExecutingFilter ctx
-        override this.OnAuthorization ctx = filters.authorizationFilter ctx
-        override this.OnException ctx = filters.exceptionFilter ctx
-        override this.OnResultExecuted ctx = filters.resultExecutedFilter ctx
-        override this.OnResultExecuting ctx = filters.resultExecutingFilter ctx
-        override this.BeginExecuteCore(cb, state) = 
-            let endExec r = 
+    inherit ControllerBase()
+        override this.ExecuteCore() = 
+            Debug.WriteLine "ExecuteCore"
+    interface IAsyncController with
+        member this.BeginExecute(requestContext, cb, state) = 
+            Debug.WriteLine "BeginExecute"
+            // cb and state are from asp.net
+            let controllerContext = ControllerContext(requestContext, this)
+            let abegin, aend, acancel = Async.AsBeginEnd action
+            let callback r = 
+                Debug.WriteLine "BeginExecute callback"
                 let result = aend r
-                result.ExecuteResult this.ControllerContext
-            abegin(this.ControllerContext, AsyncCallback(endExec), null)
+                result.ExecuteResult controllerContext
+                cb.Invoke r
 
+            abegin(controllerContext, AsyncCallback(callback), null)
+
+        member this.EndExecute r = 
+            Debug.WriteLine "EndExecute"
+        member this.Execute r = 
+            Debug.WriteLine "Execute"
 
 type Helper() =
     static member BuildControllerFromAction (action: FAction) =
