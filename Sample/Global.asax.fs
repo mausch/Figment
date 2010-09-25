@@ -2,6 +2,7 @@
 
 open System
 open System.Collections.Specialized
+open System.Net
 open System.Web
 open System.Web.Mvc
 open System.Web.UI
@@ -90,6 +91,15 @@ type MvcApplication() =
             (wbpageview "You're NOT using Internet Explorer")
 
         action ifGetDsl (wbpageview "You're using Internet Explorer")
+
+        let someasync (ctx: ControllerContext) = async {
+            let url = ctx.HttpContext.Request.RawUrl
+            let url = HttpUtility.UrlEncode url
+            use web = new WebClient()
+            let! content = web.AsyncDownloadString(Uri("http://www.google.com/search?q=" + url))
+            return Result.content content
+        }
+        asyncAction (ifUrlMatches "^/google") someasync
 
         action unconstrained (status 404 => content "<h1>Not found!</h1>")
 

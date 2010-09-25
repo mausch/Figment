@@ -26,8 +26,7 @@ type ActionRegistration = {
 let mutable registeredActions = List.empty<ActionRegistration>
 
 type RouteCollection with
-    member this.MapAction(routeConstraint: RouteConstraint, action: FAction) = 
-        let handler = FigmentRouteHandler(action)
+    member private this.MapAction(routeConstraint: RouteConstraint, handler: IRouteHandler) = 
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         let route = {new RouteBase() with
                         override this.GetRouteData ctx = 
@@ -39,25 +38,54 @@ type RouteCollection with
                                 else null
                         override this.GetVirtualPath(ctx, values) = null}
         this.Add(route)
+        route
+
+    member this.MapAction(routeConstraint: RouteConstraint, action: FAction) = 
+        let handler = FigmentRouteHandler(action)
+        let route = this.MapAction(routeConstraint, handler)
         let routeName = Guid.NewGuid().ToString()
         registeredActions <- ActionRegistration.make(routeName, action, route)::registeredActions
 
-    member this.MapWithMethod(url, routeName, httpMethod, action: FAction) =
-        let handler = FigmentRouteHandler(action)
+    member this.MapAction(routeConstraint: RouteConstraint, action: FAsyncAction) = 
+        let handler = FigmentAsyncRouteHandler(action)
+        let route = this.MapAction(routeConstraint, handler)
+        // TODO: add to registeredActions
+        ()
+
+    member private this.MapWithMethod(url, routeName, httpMethod, handler) = 
         let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         let httpMethodConstraint = HttpMethodConstraint([| httpMethod |])
         let constraints = RouteValueDictionary(dict [("httpMethod", httpMethodConstraint :> obj)])
         let route = Route(url, defaults, constraints, handler)
         this.Add(routeName, route)
+        route
+
+    member this.MapWithMethod(url, routeName, httpMethod, action: FAction) =
+        let handler = FigmentRouteHandler(action)
+        let route = this.MapWithMethod(url, routeName, httpMethod, handler)
         registeredActions <- ActionRegistration.make(routeName, action, route)::registeredActions
+
+    member this.MapWithMethod(url, routeName, httpMethod, action: FAsyncAction) =
+        let handler = FigmentAsyncRouteHandler(action)
+        let route = this.MapWithMethod(url, routeName, httpMethod, handler)
+        ()
 
     member this.MapGet(url, routeName, action: FAction) =
         this.MapWithMethod(url, routeName, "GET", action)
 
-    member this.MapPost(url, routeName, action: FAction) =  
+    member this.MapGet(url, routeName, action: FAsyncAction) =
+        this.MapWithMethod(url, routeName, "GET", action)
+
+    member this.MapPost(url, routeName, action: FAction) =
+        this.MapWithMethod(url, routeName, "POST", action)
+
+    member this.MapPost(url, routeName, action: FAsyncAction) =
         this.MapWithMethod(url, routeName, "POST", action)
 
 let action (routeConstraint: RouteConstraint) (action: FAction) = 
+    RouteTable.Routes.MapAction(routeConstraint, action)
+
+let asyncAction (routeConstraint: RouteConstraint) (action: FAsyncAction) = 
     RouteTable.Routes.MapAction(routeConstraint, action)
 
 let get url (action: FAction) =

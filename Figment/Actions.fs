@@ -1,6 +1,7 @@
 ﻿module Figment.Actions
 
 open System.Web.Mvc
+open Figment.Helpers
 
 // operators
 let concat (a: FAction) (b: FAction) (ctx: ControllerContext) =
