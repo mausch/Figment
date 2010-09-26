@@ -94,7 +94,7 @@ type MvcApplication() =
 
         action ifGetDsl (wbpageview "You're using Internet Explorer")
 
-        let someasync (ctx: ControllerContext) = async {
+        let google (ctx: ControllerContext) = async {
             Debug.WriteLine "Start async action"
             let query = ctx.HttpContext.Request.Url.Segments.[2]
             let query = HttpUtility.UrlEncode query
@@ -103,7 +103,7 @@ type MvcApplication() =
             Debug.WriteLine "got google response"
             return Result.content content
         }
-        asyncAction (ifUrlMatches "^/google/") someasync
+        asyncAction (ifMethodIsGet &&. ifUrlMatches "^/google/") google
 
         action unconstrained (status 404 => content "<h1>Not found!</h1>")
 
