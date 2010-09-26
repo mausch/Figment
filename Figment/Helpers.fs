@@ -88,3 +88,8 @@ let defaultOfMethod = uncheckedClass.GetMethod "DefaultOf"
 let defaultValueOf (t: Type) =
     let genericMethod = defaultOfMethod.MakeGenericMethod [| t |]
     genericMethod.Invoke(null, null)
+
+let asyncf f x = 
+    async {
+        return f x
+    }
