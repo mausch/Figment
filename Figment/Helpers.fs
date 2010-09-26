@@ -31,7 +31,7 @@ let DefaultControllerFilters = {
 }
 
 
-type FSharpController(action: FAction, filters: ControllerFilters) =
+type FigmentController(action: FAction, filters: ControllerFilters) =
     inherit Controller() with
         override this.OnActionExecuted ctx = filters.actionExecutedFilter ctx
         override this.OnActionExecuting ctx = filters.actionExecutingFilter ctx
@@ -43,7 +43,7 @@ type FSharpController(action: FAction, filters: ControllerFilters) =
             let result = action this.ControllerContext
             result.ExecuteResult this.ControllerContext
 
-type FSharpAsyncController(action: FAsyncAction, filters: ControllerFilters) = 
+type FigmentAsyncController(action: FAsyncAction, filters: ControllerFilters) = 
     inherit ControllerBase()
         override this.ExecuteCore() = 
             Debug.WriteLine "ExecuteCore"
@@ -68,10 +68,10 @@ type FSharpAsyncController(action: FAsyncAction, filters: ControllerFilters) =
 
 type Helper() =
     static member BuildControllerFromAction (action: FAction) =
-        new FSharpController(action, DefaultControllerFilters)
+        new FigmentController(action, DefaultControllerFilters)
 
     static member BuildControllerFromAsyncAction (action: FAsyncAction) =
-        new FSharpAsyncController(action, DefaultControllerFilters)
+        new FigmentAsyncController(action, DefaultControllerFilters)
 
 
 /// case-insensitive string comparison
