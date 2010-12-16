@@ -29,8 +29,12 @@ let notFoundOrView viewName =
 let content s = 
     ContentResult(Content = s) :> ActionResult
 
+let contentf f = Printf.kprintf content f
+
 let redirect url =
     RedirectResult(url) :> ActionResult
+
+let redirectf f = Printf.kprintf redirect f
 
 let redirectToRoute (routeValues: RouteValueDictionary) =
     RedirectToRouteResult(routeValues) :> ActionResult
