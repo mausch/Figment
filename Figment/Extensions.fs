@@ -2,6 +2,7 @@
 
 open System
 open System.Reflection
+open System.Web
 open System.Web.Mvc
 open Microsoft.FSharp.Reflection
 open System.Text.RegularExpressions
@@ -62,3 +63,7 @@ module Extensions =
                 x.Add(key, value, dependencies, absoluteExpiration, slidingExpiration, priority, onRemoveCallback) |> ignore
                 value
             
+    type HttpRequestBase with
+        member x.files =
+            x.Files.AllKeys
+            |> Seq.map (fun k -> k, x.Files.[k])
