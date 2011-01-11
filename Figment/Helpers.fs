@@ -93,3 +93,6 @@ let asyncf f x =
     async {
         return f x
     }
+
+let inline htmlencode x = HttpUtility.HtmlEncode x
+let inline urlencode (x: string) = HttpUtility.UrlEncode x

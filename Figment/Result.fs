@@ -4,6 +4,7 @@ open System.Linq
 open System.Web
 open System.Web.Mvc
 open System.Web.Routing
+open Figment.Helpers
 
 let concat (a: ActionResult) (b: ActionResult) =
     {new ActionResult() with
@@ -29,7 +30,11 @@ let notFoundOrView viewName =
 let content s = 
     ContentResult(Content = s) :> ActionResult
 
+let htmlcontent = htmlencode >> content
+    
 let contentf f = Printf.kprintf content f
+
+let htmlcontentf f = Printf.kprintf htmlcontent f
 
 let redirect url =
     RedirectResult(url) :> ActionResult
