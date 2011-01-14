@@ -66,6 +66,18 @@ module Extensions =
     type HttpSessionStateBase with
         member x.asDict =
             let notimpl() = raise <| NotImplementedException()
+            let getEnumerator() =
+                let sessionEnum = x.GetEnumerator()
+                let wrapElem (o: obj) = 
+                    let key = o :?> string
+                    let value = x.[key]
+                    KeyValuePair(key,value)
+                { new IEnumerator<KeyValuePair<string,obj>> with
+                    member e.Current = wrapElem sessionEnum.Current
+                    member e.MoveNext() = sessionEnum.MoveNext()
+                    member e.Reset() = sessionEnum.Reset()
+                    member e.Dispose() = ()
+                    member e.Current = box (wrapElem sessionEnum.Current) }
             { new IDictionary<string,obj> with
                 member d.Count = x.Count
                 member d.IsReadOnly = false 
@@ -93,8 +105,8 @@ module Extensions =
                 member d.Contains item = x.[item.Key] = item.Value
                 member d.ContainsKey key = x.[key] <> null
                 member d.CopyTo(array,arrayIndex) = notimpl()
-                member d.GetEnumerator() : IEnumerator<KeyValuePair<string,obj>> = notimpl()
-                member d.GetEnumerator() : IEnumerator = notimpl()
+                member d.GetEnumerator() : IEnumerator<KeyValuePair<string,obj>> = getEnumerator()
+                member d.GetEnumerator() : IEnumerator = upcast getEnumerator()
                 member d.Remove (item: KeyValuePair<string,obj>) = 
                     if d.Contains item then
                         x.Remove item.Key
