@@ -44,8 +44,8 @@ module Filters =
         // TODO set the other cache parameters
         action ctx
 
-    let requireHttps (action: FAction) (ctx: ControllerContext) = 
-        Internals.irequireHttps action redirect ctx
+    let requireHttps (action: FAction) = 
+        Internals.irequireHttps action redirect
 
     let apply (filter: Filter) (actions: seq<string * FAction>) =
         actions |> Seq.map (fun (k,v) -> (k, filter v))

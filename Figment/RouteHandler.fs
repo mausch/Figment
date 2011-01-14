@@ -15,7 +15,7 @@ type FigmentHandler(context: RequestContext, action: FAction) =
         (controller :> IController).Execute context
 
     interface IHttpHandler with
-        member this.IsReusable with get() = false
+        member this.IsReusable = false
         member this.ProcessRequest ctx =
             this.ProcessRequest(HttpContextWrapper(ctx))
 
@@ -25,7 +25,7 @@ type FigmentAsyncHandler(context: RequestContext, action: FAsyncAction) =
         (controller :> IController).Execute context
 
     interface IHttpAsyncHandler with
-        member this.IsReusable with get() = false
+        member this.IsReusable = false
         member this.ProcessRequest ctx =
             this.ProcessRequest(HttpContextWrapper(ctx))
         member this.BeginProcessRequest(ctx, cb, state) = 
