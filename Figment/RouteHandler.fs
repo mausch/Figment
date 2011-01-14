@@ -14,6 +14,7 @@ type FigmentHandler(context: RequestContext, action: FAction) =
         let controller = Helper.BuildControllerFromAction action
         (controller :> IController).Execute context
 
+    interface System.Web.SessionState.IRequiresSessionState
     interface IHttpHandler with
         member this.IsReusable = false
         member this.ProcessRequest ctx =
@@ -24,6 +25,7 @@ type FigmentAsyncHandler(context: RequestContext, action: FAsyncAction) =
         let controller = Helper.BuildControllerFromAsyncAction action
         (controller :> IController).Execute context
 
+    interface System.Web.SessionState.IRequiresSessionState
     interface IHttpAsyncHandler with
         member this.IsReusable = false
         member this.ProcessRequest ctx =
