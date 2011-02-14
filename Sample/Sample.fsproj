@@ -80,6 +80,16 @@
       <Project>{a080b979-6e39-44c4-ac1a-4850e32c355a}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\FsFormlets\Formlets\Formlets.fsproj">
+      <Name>Formlets</Name>
+      <Project>{d628a18c-7c64-48cd-bc52-add7a88a8770}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\FsFormlets\WingBeats.Formlets\WingBeats.Formlets.fsproj">
+      <Name>WingBeats.Formlets</Name>
+      <Project>{c920fcb6-bf44-4884-a744-1409ac0a21c4}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 	     Other similar extension points exist, see Microsoft.Common.targets.

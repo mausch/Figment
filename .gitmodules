@@ -1,0 +1,3 @@
+[submodule "FsFormlets"]
+	path = FsFormlets
+	url = git://github.com/mausch/FsFormlets.git
