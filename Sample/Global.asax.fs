@@ -128,9 +128,9 @@ type MvcApplication() =
 
             yields (fun f l e d -> 
                         { FirstName = f; LastName = l; Email = e; DateOfBirth = d })
-            <*> f.LabeledTextBox("First name: ", "", [])
+            <*> (f.LabeledTextBox("First name: ", "", []) |> Validate.notEmpty)
             <+ e.Br()
-            <*> f.LabeledTextBox("Last name: ", "", [])
+            <*> (f.LabeledTextBox("Last name: ", "", []) |> Validate.notEmpty)
             <+ e.Br()
             <*> (f.LabeledTextBox("Email: ", "", []) |> Validate.isEmail)
             <+ e.Br()
@@ -156,13 +156,17 @@ type MvcApplication() =
                 ]
             ]
 
-        get "register" (fun _ -> Result.wbview (registrationPage "register" (renderToXml registrationFormlet)))
-        post "register" 
-            (fun ctx -> 
-                let env = EnvDict.fromNV ctx.HttpContext.Request.Form
-                match run registrationFormlet env with
-                | Success v -> Result.contentf "Thank you for registering, %s %s" v.FirstName v.LastName
-                | Failure(errorForm, _) -> Result.wbview (registrationPage "register" errorForm))
+        let formAction url formlet page successHandler =
+            get url (fun _ -> Result.wbview (page url (renderToXml formlet)))
+            post url
+                (fun ctx -> 
+                    let env = EnvDict.fromFormAndFiles ctx.HttpContext.Request
+                    match run formlet env with
+                    | Success v -> successHandler ctx v
+                    | Failure(errorForm, _) -> Result.wbview (page url errorForm))
+            
+        formAction "register" registrationFormlet registrationPage 
+            (fun _ v -> Result.contentf "Thank you for registering, %s %s" v.FirstName v.LastName)
 
         action any (status 404 => content "<h1>Not found!</h1>")
         
