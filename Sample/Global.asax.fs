@@ -143,6 +143,7 @@ type MvcApplication() =
             e.Html [
                 e.Head [
                     e.Title [ &"Registration" ]
+                    e.Style [ &".error {color:red}" ]
                 ]
                 e.Body [
                     e.H1 [ &"Registration" ]
