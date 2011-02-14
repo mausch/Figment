@@ -116,15 +116,15 @@ type MvcApplication() =
             let dateFormlet : DateTime Formlet =
                 let baseFormlet = 
                     yields t3
-                    <*> f.LabeledTextBox("Year: ", "", [])
                     <*> f.LabeledTextBox("Month: ", "", [])
                     <*> f.LabeledTextBox("Day: ", "", [])
-                let isDate (year,month,day) = 
+                    <*> f.LabeledTextBox("Year: ", "", [])
+                let isDate (month,day,year) = 
                     DateTime.TryParseExact(sprintf "%s%s%s" year month day, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None) |> fst
                 let dateValidator = err isDate (fun _ -> "Invalid date")
                 baseFormlet 
                 |> satisfies dateValidator
-                |> map (fun (year,month,day) -> DateTime(int year,int month,int day))
+                |> map (fun (month,day,year) -> DateTime(int year,int month,int day))
 
             yields (fun f l e d -> 
                         { FirstName = f; LastName = l; Email = e; DateOfBirth = d })
