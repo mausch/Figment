@@ -22,7 +22,7 @@ let (!.) (x: RouteConstraint) (ctx: HttpContextBase, route: RouteData) =
     not (x(ctx, route))
 
 (* constraints *)
-let unconstrained (ctx: HttpContextBase, route: RouteData) = true
+let any (ctx: HttpContextBase, route: RouteData) = true
 
 let ifUrlMatches (rx: string) =
     if rx = null

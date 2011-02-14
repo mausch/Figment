@@ -105,6 +105,6 @@ type MvcApplication() =
         }
         asyncAction (ifMethodIsGet &&. ifUrlMatches "^/google/") google
 
-        action unconstrained (status 404 => content "<h1>Not found!</h1>")
+        action any (status 404 => content "<h1>Not found!</h1>")
 
         ()
