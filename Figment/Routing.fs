@@ -91,7 +91,7 @@ let asyncAction (routeConstraint: RouteConstraint) (action: FAsyncAction) =
 let get url (action: FAction) =
     RouteTable.Routes.MapGet(url, null, action)
 
-let getN url routeName (action: FAction) =
+let getn url routeName (action: FAction) =
     RouteTable.Routes.MapGet(url, routeName, action)
 
 let stripFormatting s =
@@ -124,16 +124,16 @@ let rec bindAll (fTypes: Type list) (parameters: string list) (ctx: ControllerCo
         let v = bindSingleParameterNG hd (List.head parameters) ctx.Controller.ValueProvider ctx
         v::bindAll tl (List.tail parameters) ctx
 
-let getSN (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) routeName (action: 'a -> 'b) =
+let getnf (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) routeName (action: 'a -> 'b) =
     let url, parameters = stripFormatting fmt.Value
     let args = FSharpType.GetFlattenedFunctionElements(action.GetType())
     let realAction ctx = 
         let values = bindAll args parameters ctx
         FSharpValue.InvokeFunction action values :?> ActionResult
-    getN url routeName realAction
+    getn url routeName realAction
 
-let getS (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) (action: 'a -> 'b) = 
-    getSN fmt null action
+let getf (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) (action: 'a -> 'b) = 
+    getnf fmt null action
 
 let post url (action: FAction) =
     RouteTable.Routes.MapPost(url, null, action)

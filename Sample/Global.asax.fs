@@ -72,7 +72,7 @@ type MvcApplication() =
         let nameAndAge firstname lastname age = 
             sprintf "Hello %s %s, %d years old" firstname lastname age
             |> Result.content
-        getS "route/{firstname:%s}/{lastname:%s}/{age:%d}" nameAndAge
+        getf "route/{firstname:%s}/{lastname:%s}/{age:%d}" nameAndAge
 
         // wing beats integration
         let e = XhtmlElement()
