@@ -138,7 +138,7 @@ type MvcApplication() =
             <+ e.Br()
             <+ e.Text "Please read very carefully these terms and conditions before registering for this online program, blah blah blah"
             <+ e.Br()
-            <* (f.CheckBox false |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")))
+            <* (f.LabeledCheckBox("I agree to the terms and conditions above", false, []) |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")))
         let registrationPage url form =
             e.Html [
                 e.Head [
