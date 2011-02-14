@@ -2,6 +2,8 @@
 
 open System
 open System.Collections.Specialized
+open System.Diagnostics
+open System.Globalization
 open System.Net
 open System.Web
 open System.Web.Mvc
@@ -15,13 +17,14 @@ open Figment.Binding
 open Figment.Filters
 open WingBeats.Xhtml
 open WingBeats.Xml
-
-open System.Diagnostics
+open Formlets
+open WingBeats.Formlets
 
 type PersonalInfo = {
-    firstName: string
-    lastName: string
-    age: int
+    FirstName: string
+    LastName: string
+    Email: string
+    DateOfBirth: DateTime
 }
 
 type MvcApplication() =
@@ -39,7 +42,7 @@ type MvcApplication() =
 
         // applying cache, showing a regular ASP.NET MVC view
         let cache300 = cache (OutputCacheParameters(Duration = 300, Location = OutputCacheLocation.Any))
-        get "showform" (cache300 <| view "sampleform" { firstName = "Cacho"; lastName = "Castaña"; age = 68})
+        get "showform" (cache300 <| view "sampleform" { FirstName = "Cacho"; LastName = "Castaña"; Email = ""; DateOfBirth = DateTime.MinValue })
 
         // handle post to "action6"
         // first, a regular function
@@ -94,6 +97,7 @@ type MvcApplication() =
 
         action ifGetDsl (wbpageview "You're using Internet Explorer")
 
+        // async
         let google (ctx: ControllerContext) = async {
             Debug.WriteLine "Start async action"
             let query = ctx.HttpContext.Request.Url.Segments.[2]
@@ -105,6 +109,61 @@ type MvcApplication() =
         }
         asyncAction (ifMethodIsGet &&. ifUrlMatches "^/google/") google
 
-        action any (status 404 => content "<h1>Not found!</h1>")
+        // formlets
+        let s = e.Shortcut
+        let f = e.Formlets
+        let registrationFormlet : PersonalInfo Formlet =
+            let dateFormlet : DateTime Formlet =
+                let baseFormlet = 
+                    yields t3
+                    <*> f.LabeledTextBox("Year: ", "", [])
+                    <*> f.LabeledTextBox("Month: ", "", [])
+                    <*> f.LabeledTextBox("Day: ", "", [])
+                let isDate (year,month,day) = 
+                    DateTime.TryParseExact(sprintf "%s%s%s" year month day, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None) |> fst
+                let dateValidator = err isDate (fun _ -> "Invalid date")
+                baseFormlet 
+                |> satisfies dateValidator
+                |> map (fun (year,month,day) -> DateTime(int year,int month,int day))
 
+            yields (fun f l e d -> 
+                        { FirstName = f; LastName = l; Email = e; DateOfBirth = d })
+            <*> f.LabeledTextBox("First name: ", "", [])
+            <+ e.Br()
+            <*> f.LabeledTextBox("Last name: ", "", [])
+            <+ e.Br()
+            <*> (f.LabeledTextBox("Email: ", "", []) |> Validate.isEmail)
+            <+ e.Br()
+            <*> dateFormlet
+            <+ e.Br()
+            <+ e.Text "Please read very carefully these terms and conditions before registering for this online program, blah blah blah"
+            <+ e.Br()
+            <* (f.CheckBox false |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")))
+        let registrationPage url form =
+            e.Html [
+                e.Head [
+                    e.Title [ &"Registration" ]
+                ]
+                e.Body [
+                    e.H1 [ &"Registration" ]
+                    s.FormPost url [
+                        e.Fieldset [
+                            yield e.Legend [ &"Please fill the fields below" ]
+                            yield!!+form
+                            yield s.Submit "Register!"
+                        ]
+                    ]
+                ]
+            ]
+
+        get "register" (fun _ -> Result.wbview (registrationPage "register" (renderToXml registrationFormlet)))
+        post "register" 
+            (fun ctx -> 
+                let env = EnvDict.fromNV ctx.HttpContext.Request.Form
+                match run registrationFormlet env with
+                | Success v -> Result.contentf "Thank you for registering, %s %s" v.FirstName v.LastName
+                | Failure(errorForm, _) -> Result.wbview (registrationPage "register" errorForm))
+
+        action any (status 404 => content "<h1>Not found!</h1>")
+        
         ()
