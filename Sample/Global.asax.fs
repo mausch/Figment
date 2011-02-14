@@ -156,15 +156,6 @@ type MvcApplication() =
                     ]
                 ]
             ]
-
-        let formAction url formlet page successHandler =
-            get url (fun _ -> Result.wbview (page url (renderToXml formlet)))
-            post url
-                (fun ctx -> 
-                    let env = EnvDict.fromFormAndFiles ctx.HttpContext.Request
-                    match run formlet env with
-                    | Success v -> successHandler ctx v
-                    | Failure(errorForm, _) -> Result.wbview (page url errorForm))
             
         formAction "register" registrationFormlet registrationPage 
             (fun _ v -> Result.contentf "Thank you for registering, %s %s" v.FirstName v.LastName)

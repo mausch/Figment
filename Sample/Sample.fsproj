@@ -43,6 +43,7 @@
   <ItemGroup>
     <Content Include="web.config" />
     <Compile Include="WingBeatsExtensions.fs" />
+    <Compile Include="FormletsExtensions.fs" />
     <Compile Include="Actions.fs" />
     <Content Include="Global.asax" />
     <Compile Include="Global.asax.fs" />

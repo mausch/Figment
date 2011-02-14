@@ -81,23 +81,11 @@ let bind2alt (parameter1: string) (parameter2: string) (f: 'a -> 'b -> 'c) (ctx:
 let contentResult (action: 'a -> string) a =
     action a |> Result.content
 
-let formAction (action: NameValueCollection -> 'a) (ctx: ControllerContext) =
+let bindForm (action: NameValueCollection -> 'a) (ctx: ControllerContext) =
     action ctx.HttpContext.Request.Form
 
 let bindQuerystring (action: NameValueCollection -> 'a) (ctx: ControllerContext) = 
     action ctx.HttpContext.Request.QueryString
-
-let bindForm (action: 'a -> 'b) (e: Expr<'a -> 'b>) (ctx: ControllerContext) = 
-    let pname = match e with
-                | Lambda(var, body) -> var.Name
-                | x -> failwithf "Expected lambda, actual %A" x
-
-    let r = bindOne<'a> pname ctx
-    action r
-
-let bindFormToRecord (action: 'a -> 'b) =
-    // TODO
-    ()
 
 let buildModelBinder f =
     { new IModelBinder with
