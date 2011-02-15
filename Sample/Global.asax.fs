@@ -78,14 +78,14 @@ type MvcApplication() =
         // wing beats integration
         let e = XhtmlElement()
         let wbpage title = 
-            e.Html [
+            [e.Html [
                 e.Head [
                     e.Title [ &title ]
                 ]
                 e.Body [
                     e.H1 [ &title ]
                 ]
-            ]
+            ]]
         let wbpageview = wbpage >> wbview
         get "wingbeats" (wbpageview "Hello World from Wing Beats")
 
@@ -141,24 +141,26 @@ type MvcApplication() =
             <+ e.Br()
             <* (f.LabeledCheckBox("I agree to the terms and conditions above", false, []) |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")))
         let registrationPage url form =
-            e.Html [
-                e.Head [
-                    e.Title [ &"Registration" ]
-                    e.Style [ &".error {color:red}" ]
-                ]
-                e.Body [
-                    e.H1 [ &"Registration" ]
-                    s.FormPost url [
-                        e.Fieldset [
-                            yield e.Legend [ &"Please fill the fields below" ]
-                            yield!!+form
-                            yield e.Br()
-                            yield s.Submit "Register!"
+            [ 
+                e.DocTypeTransitional
+                e.Html [
+                    e.Head [
+                        e.Title [ &"Registration" ]
+                        e.Style [ &".error {color:red}" ]
+                    ]
+                    e.Body [
+                        e.H1 [ &"Registration" ]
+                        s.FormPost url [
+                            e.Fieldset [
+                                yield e.Legend [ &"Please fill the fields below" ]
+                                yield!!+form
+                                yield e.Br()
+                                yield s.Submit "Register!"
+                            ]
                         ]
                     ]
                 ]
             ]
-
         get "thankyou" (fun ctx -> Result.contentf "Thank you for registering, %s %s" ctx.QueryString.["f"] ctx.QueryString.["l"])
             
         formAction "register" registrationFormlet registrationPage 
