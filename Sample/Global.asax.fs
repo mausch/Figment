@@ -111,6 +111,25 @@ type MvcApplication() =
         asyncAction (ifMethodIsGet &&. ifUrlMatches "^/google/") google
 
         // formlets
+
+        let layout title body =
+            [ 
+                e.DocTypeHTML5
+                e.Html [
+                    e.Head [
+                        e.Title [ &title ]
+                        e.Style [ 
+                            &".error {color:red;}"
+                            &"body {font-family:Verdana,Geneva,sans-serif; line-height: 160%;}"
+                        ]
+                    ]
+                    e.Body [
+                        yield e.H1 [ &title ]
+                        yield! body
+                    ]
+                ]
+            ]
+
         let s = e.Shortcut
         let f = e.Formlets
         let registrationFormlet : PersonalInfo Formlet =
@@ -135,35 +154,24 @@ type MvcApplication() =
             <+ e.Br()
             <*> (f.LabeledTextBox("Email: ", "", ["type","email"; "required",""]) |> Validate.isEmail)
             <+ e.Br()
-            <*> dateFormlet
+            <+ e.Text "Date of birth: " <*> dateFormlet
             <+ e.Br()
             <+ e.Text "Please read very carefully these terms and conditions before registering for this online program, blah blah blah"
             <+ e.Br()
             <* (f.LabeledCheckBox("I agree to the terms and conditions above", false, []) |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")))
+
         let registrationPage url form =
-            [ 
-                e.DocTypeHTML5
-                e.Html [
-                    e.Head [
-                        e.Title [ &"Registration" ]
-                        e.Style [ 
-                            &".error {color:red;}"
-                            &"body {font-family:Verdana,Geneva,sans-serif; line-height: 160%;}"
-                        ]
-                    ]
-                    e.Body [
-                        e.H1 [ &"Registration" ]
-                        s.FormPost url [
-                            e.Fieldset [
-                                yield e.Legend [ &"Please fill the fields below" ]
-                                yield!!+form
-                                yield e.Br()
-                                yield s.Submit "Register!"
-                            ]
-                        ]
+            layout "Registration" [
+                s.FormPost url [
+                    e.Fieldset [
+                        yield e.Legend [ &"Please fill the fields below" ]
+                        yield!!+form
+                        yield e.Br()
+                        yield s.Submit "Register!"
                     ]
                 ]
             ]
+
         get "thankyou" (fun ctx -> Result.contentf "Thank you for registering, %s %s" ctx.QueryString.["f"] ctx.QueryString.["l"])
             
         formAction "register" registrationFormlet registrationPage 
