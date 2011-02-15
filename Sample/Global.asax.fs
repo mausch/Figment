@@ -117,9 +117,9 @@ type MvcApplication() =
             let dateFormlet : DateTime Formlet =
                 let baseFormlet = 
                     yields t3
-                    <*> f.LabeledTextBox("Month: ", "", [])
-                    <*> f.LabeledTextBox("Day: ", "", [])
-                    <*> f.LabeledTextBox("Year: ", "", [])
+                    <*> f.LabeledTextBox("Month: ", "", ["size","2"; "maxlength","2"])
+                    <*> f.LabeledTextBox("Day: ", "", ["size","2"; "maxlength","2"])
+                    <*> f.LabeledTextBox("Year: ", "", ["size","4"; "maxlength","4"])
                 let isDate (month,day,year) = 
                     DateTime.TryParseExact(sprintf "%s%s%s" year month day, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None) |> fst
                 let dateValidator = err isDate (fun _ -> "Invalid date")
@@ -152,6 +152,7 @@ type MvcApplication() =
                         e.Fieldset [
                             yield e.Legend [ &"Please fill the fields below" ]
                             yield!!+form
+                            yield e.Br()
                             yield s.Submit "Register!"
                         ]
                     ]
