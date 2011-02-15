@@ -117,9 +117,9 @@ type MvcApplication() =
             let dateFormlet : DateTime Formlet =
                 let baseFormlet = 
                     yields t3
-                    <*> f.LabeledTextBox("Month: ", "", ["size","2"; "maxlength","2"; "type","number"; "min","1"; "max","12"; "required",""])
-                    <*> f.LabeledTextBox("Day: ", "", ["size","2"; "maxlength","2"; "type","number"; "min","1"; "max","31"; "required",""])
-                    <*> f.LabeledTextBox("Year: ", "", ["size","4"; "maxlength","4"; "type","number"; "min","1900"; "required",""])
+                    <*> f.LabeledTextBox("Month: ", "", ["size","3"; "maxlength","2"; "type","number"; "min","1"; "max","12"; "required",""])
+                    <*> f.LabeledTextBox("Day: ", "", ["size","3"; "maxlength","2"; "type","number"; "min","1"; "max","31"; "required",""])
+                    <*> f.LabeledTextBox("Year: ", "", ["size","5"; "maxlength","4"; "type","number"; "min","1900"; "required",""])
                 let isDate (month,day,year) = 
                     DateTime.TryParseExact(sprintf "%s%s%s" year month day, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None) |> fst
                 let dateValidator = err isDate (fun _ -> "Invalid date")
@@ -146,7 +146,10 @@ type MvcApplication() =
                 e.Html [
                     e.Head [
                         e.Title [ &"Registration" ]
-                        e.Style [ &".error {color:red}" ]
+                        e.Style [ 
+                            &".error {color:red;}"
+                            &"body {font-family:Verdana,Geneva,sans-serif; line-height: 160%;}"
+                        ]
                     ]
                     e.Body [
                         e.H1 [ &"Registration" ]
