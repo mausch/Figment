@@ -131,3 +131,4 @@ module Extensions =
         member x.UserHostAddress = x.HttpContext.Request.UserHostAddress
         member x.Session = x.HttpContext.Session
         member x.SessionDict = x.HttpContext.Session.asDict
+        member x.QueryString = x.HttpContext.Request.QueryString

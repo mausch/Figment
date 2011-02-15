@@ -19,6 +19,7 @@ open WingBeats.Xhtml
 open WingBeats.Xml
 open Formlets
 open WingBeats.Formlets
+open Figment.Extensions
 
 type PersonalInfo = {
     FirstName: string
@@ -156,9 +157,11 @@ type MvcApplication() =
                     ]
                 ]
             ]
+
+        get "thankyou" (fun ctx -> Result.contentf "Thank you for registering, %s %s" ctx.QueryString.["f"] ctx.QueryString.["l"])
             
         formAction "register" registrationFormlet registrationPage 
-            (fun _ v -> Result.contentf "Thank you for registering, %s %s" v.FirstName v.LastName)
+            (fun _ v -> Result.redirectf "thankyou?f=%s&l=%s" v.FirstName v.LastName)
 
         action any (status 404 => content "<h1>Not found!</h1>")
         
