@@ -21,3 +21,10 @@ module XhtmlElementExtensions =
                       pubid  = "-//W3C//DTD XHTML 1.0 Transitional//EN"
                       sysid  = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
                       subset = null })
+
+        member x.DocTypeHTML5 =
+            DocType({ name   = "html"
+                      pubid  = null
+                      sysid  = null
+                      subset = null })
+    //<!DOCTYPE html>

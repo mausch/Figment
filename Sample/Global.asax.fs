@@ -117,9 +117,9 @@ type MvcApplication() =
             let dateFormlet : DateTime Formlet =
                 let baseFormlet = 
                     yields t3
-                    <*> f.LabeledTextBox("Month: ", "", ["size","2"; "maxlength","2"])
-                    <*> f.LabeledTextBox("Day: ", "", ["size","2"; "maxlength","2"])
-                    <*> f.LabeledTextBox("Year: ", "", ["size","4"; "maxlength","4"])
+                    <*> f.LabeledTextBox("Month: ", "", ["size","2"; "maxlength","2"; "type","number"; "min","1"; "max","12"; "required",""])
+                    <*> f.LabeledTextBox("Day: ", "", ["size","2"; "maxlength","2"; "type","number"; "min","1"; "max","31"; "required",""])
+                    <*> f.LabeledTextBox("Year: ", "", ["size","4"; "maxlength","4"; "type","number"; "min","1900"; "required",""])
                 let isDate (month,day,year) = 
                     DateTime.TryParseExact(sprintf "%s%s%s" year month day, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None) |> fst
                 let dateValidator = err isDate (fun _ -> "Invalid date")
@@ -129,11 +129,11 @@ type MvcApplication() =
 
             yields (fun f l e d -> 
                         { FirstName = f; LastName = l; Email = e; DateOfBirth = d })
-            <*> (f.LabeledTextBox("First name: ", "", []) |> Validate.notEmpty)
+            <*> (f.LabeledTextBox("First name: ", "", ["required",""]) |> Validate.notEmpty)
             <+ e.Br()
-            <*> (f.LabeledTextBox("Last name: ", "", []) |> Validate.notEmpty)
+            <*> (f.LabeledTextBox("Last name: ", "", ["required",""]) |> Validate.notEmpty)
             <+ e.Br()
-            <*> (f.LabeledTextBox("Email: ", "", []) |> Validate.isEmail)
+            <*> (f.LabeledTextBox("Email: ", "", ["type","email"; "required",""]) |> Validate.isEmail)
             <+ e.Br()
             <*> dateFormlet
             <+ e.Br()
@@ -142,7 +142,7 @@ type MvcApplication() =
             <* (f.LabeledCheckBox("I agree to the terms and conditions above", false, []) |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")))
         let registrationPage url form =
             [ 
-                e.DocTypeTransitional
+                e.DocTypeHTML5
                 e.Html [
                     e.Head [
                         e.Title [ &"Registration" ]
