@@ -8,8 +8,6 @@ open Figment.Extensions
 let assertThrows<'e when 'e :> exn> f = 
     Assert.Throws<'e>(Assert.ThrowsDelegate(f)) |> ignore
 
-let (=.) a b = Assert.Equal(b,a)
-
 [<Fact>]
 let InvokeFunction() =
     let f a b c = a + b + c
@@ -27,16 +25,16 @@ let GetFlattenedFunctionElements_non_function() =
 let GetFlattenedFunctionElements_unit_int() =
     let f() = 2
     let t = FSharpType.GetFlattenedFunctionElements(f.GetType())
-    t.Length =. 2
-    t.[0] =. typeof<unit>
-    t.[1] =. typeof<int>    
+    Assert.Equal(2, t.Length)
+    Assert.Equal(typeof<unit>, t.[0])
+    Assert.Equal(typeof<int>, t.[1])
 
 [<Fact>]
 let GetFlattenedFunctionElements_int_float_string() =
     let f (i: int) (j: float) = "bla"
     let t = FSharpType.GetFlattenedFunctionElements(f.GetType())
-    t.Length =. 3
-    t.[0] =. typeof<int>
-    t.[1] =. typeof<float>
-    t.[2] =. typeof<string>
+    Assert.Equal(2, t.Length)
+    Assert.Equal(typeof<int>, t.[0])
+    Assert.Equal(typeof<float>, t.[1])
+    Assert.Equal(typeof<string>, t.[2])
     
