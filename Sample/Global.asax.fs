@@ -178,10 +178,11 @@ type MvcApplication() =
 
         get "thankyou" (fun ctx -> Result.contentf "Thank you for registering, %s %s" ctx.QueryString.["f"] ctx.QueryString.["l"])
             
-        formAction "register" 
-            (fun ctx -> registrationFormlet ctx.IP) 
-            registrationPage
-            (fun _ v -> Result.redirectf "thankyou?f=%s&l=%s" v.FirstName v.LastName)
+        formAction "register" {
+            Formlet = fun ctx -> registrationFormlet ctx.IP
+            Page = registrationPage
+            Success = fun _ v -> Result.redirectf "thankyou?f=%s&l=%s" v.FirstName v.LastName
+        }
 
         action any (status 404 => content "<h1>Not found!</h1>")
         
