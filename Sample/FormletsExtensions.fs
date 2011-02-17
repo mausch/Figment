@@ -13,11 +13,14 @@ module FormletsExtensions =
     /// <param name="page">Function taking an URL and rendered formlet and returning a wingbeats tree</param>
     /// <param name="successHandler">When formlet is successful, run this function</param>
     let formAction url formlet page successHandler =
-        get url (fun _ -> formlet |> renderToXml |> page url |> Result.wbview)
+        get url 
+            (fun ctx -> 
+                let xml = formlet ctx |> renderToXml
+                page url xml ctx |> Result.wbview)
         post url
             (fun ctx -> 
                 let env = EnvDict.fromFormAndFiles ctx.HttpContext.Request
-                match run formlet env with
+                match run (formlet ctx) env with
                 | Success v -> successHandler ctx v
-                | Failure(errorForm, _) -> Result.wbview (page url errorForm))
+                | Failure(errorForm, _) -> page url errorForm ctx |> Result.wbview)
 

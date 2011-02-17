@@ -132,7 +132,9 @@ type MvcApplication() =
 
         let s = e.Shortcut
         let f = e.Formlets
-        let registrationFormlet : PersonalInfo Formlet =
+        let registrationFormlet =
+            let reCaptcha = reCaptcha {PublicKey = "6LfbkMESAAAAAPBL8AK4JhtzHMgcRez3UlQ9FZkz"; PrivateKey = "6LfbkMESAAAAANzdOHD_A6uZwAplnJCoiL2F6hEF"; MockedResult = None}
+
             let dateFormlet : DateTime Formlet =
                 let baseFormlet = 
                     yields t3
@@ -146,21 +148,23 @@ type MvcApplication() =
                 |> satisfies dateValidator
                 |> map (fun (month,day,year) -> DateTime(int year,int month,int day))
 
-            yields (fun f l e d -> 
-                        { FirstName = f; LastName = l; Email = e; DateOfBirth = d })
-            <*> (f.LabeledTextBox("First name: ", "", ["required",""]) |> Validate.notEmpty)
-            <+ e.Br()
-            <*> (f.LabeledTextBox("Last name: ", "", ["required",""]) |> Validate.notEmpty)
-            <+ e.Br()
-            <*> (f.LabeledTextBox("Email: ", "", ["type","email"; "required",""]) |> Validate.isEmail)
-            <+ e.Br()
-            <+ e.Text "Date of birth: " <*> dateFormlet
-            <+ e.Br()
-            <+ e.Text "Please read very carefully these terms and conditions before registering for this online program, blah blah blah"
-            <+ e.Br()
-            <* (f.LabeledCheckBox("I agree to the terms and conditions above", false, []) |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")))
+            fun ip ->
+                yields (fun f l e d -> 
+                            { FirstName = f; LastName = l; Email = e; DateOfBirth = d })
+                <*> (f.LabeledTextBox("First name: ", "", ["required",""]) |> Validate.notEmpty)
+                <+ e.Br()
+                <*> (f.LabeledTextBox("Last name: ", "", ["required",""]) |> Validate.notEmpty)
+                <+ e.Br()
+                <*> (f.LabeledTextBox("Email: ", "", ["type","email"; "required",""]) |> Validate.isEmail)
+                <+ e.Br()
+                <+ e.Text "Date of birth: " <*> dateFormlet
+                <+ e.Br()
+                <+ e.Text "Please read very carefully these terms and conditions before registering for this online program, blah blah blah"
+                <+ e.Br()
+                <* (f.LabeledCheckBox("I agree to the terms and conditions above", false, []) |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")))
+                <* reCaptcha ip
 
-        let registrationPage url form =
+        let registrationPage url form _ =
             layout "Registration" [
                 s.FormPost url [
                     e.Fieldset [
@@ -174,7 +178,9 @@ type MvcApplication() =
 
         get "thankyou" (fun ctx -> Result.contentf "Thank you for registering, %s %s" ctx.QueryString.["f"] ctx.QueryString.["l"])
             
-        formAction "register" registrationFormlet registrationPage 
+        formAction "register" 
+            (fun ctx -> registrationFormlet ctx.IP) 
+            registrationPage
             (fun _ v -> Result.redirectf "thankyou?f=%s&l=%s" v.FirstName v.LastName)
 
         action any (status 404 => content "<h1>Not found!</h1>")

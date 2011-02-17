@@ -128,7 +128,8 @@ module Extensions =
     type ControllerContext with
         member x.UrlHelper = UrlHelper(x.RequestContext)
         member x.Cache = x.HttpContext.Cache
-        member x.UserHostAddress = x.HttpContext.Request.UserHostAddress
         member x.Session = x.HttpContext.Session
-        member x.SessionDict = x.HttpContext.Session.asDict
-        member x.QueryString = x.HttpContext.Request.QueryString
+        member x.SessionDict = x.Session.asDict
+        member x.Request = x.HttpContext.Request
+        member x.QueryString = x.Request.QueryString
+        member x.IP = x.Request.UserHostAddress
