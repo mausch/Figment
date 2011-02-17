@@ -75,7 +75,7 @@ type Helper() =
 
 
 /// case-insensitive string comparison
-let (==.) (x: string) (y: string) = 
+let (=.) (x: string) (y: string) = 
     StringComparer.InvariantCultureIgnoreCase.Compare(x,y) = 0
 
 /// case-insensitive string comparison
