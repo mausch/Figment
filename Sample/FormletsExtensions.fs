@@ -16,11 +16,11 @@ module FormletsExtensions =
         get url 
             (fun ctx -> 
                 let xml = formlet ctx |> renderToXml
-                page url xml ctx |> Result.wbview)
+                page xml ctx |> Result.wbview)
         post url
             (fun ctx -> 
                 let env = EnvDict.fromFormAndFiles ctx.HttpContext.Request
                 match run (formlet ctx) env with
                 | Success v -> successHandler ctx v
-                | Failure(errorForm, _) -> page url errorForm ctx |> Result.wbview)
+                | Failure(errorForm, _) -> page errorForm ctx |> Result.wbview)
 

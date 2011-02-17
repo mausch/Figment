@@ -164,9 +164,9 @@ type MvcApplication() =
                 <* (f.LabeledCheckBox("I agree to the terms and conditions above", false, []) |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")))
                 <* reCaptcha ip
 
-        let registrationPage url form _ =
+        let registrationPage form _ =
             layout "Registration" [
-                s.FormPost url [
+                s.FormPost "" [
                     e.Fieldset [
                         yield e.Legend [ &"Please fill the fields below" ]
                         yield!!+form
