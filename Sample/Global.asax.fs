@@ -138,9 +138,9 @@ type MvcApplication() =
             let dateFormlet : DateTime Formlet =
                 let baseFormlet = 
                     yields t3
-                    <*> (f.Text(size = 3, maxlength = 2, attributes = ["type","number"; "min","1"; "max","12"; "required",""]) |> f.WithLabel "Month: ")
-                    <*> (f.Text(size = 3, maxlength = 2, attributes = ["type","number"; "min","1"; "max","31"; "required",""]) |> f.WithLabel "Day: ")
-                    <*> (f.Text(size = 5, maxlength = 4, attributes = ["type","number"; "min","1900"; "required",""]) |> f.WithLabel "Year: ")
+                    <*> (f.Text(maxlength = 2, attributes = ["type","number"; "min","1"; "max","12"; "required",""; "size","3"]) |> f.WithLabel "Month: ")
+                    <*> (f.Text(maxlength = 2, attributes = ["type","number"; "min","1"; "max","31"; "required",""; "size","3"]) |> f.WithLabel "Day: ")
+                    <*> (f.Text(maxlength = 4, attributes = ["type","number"; "min","1900"; "required",""; "size","5"]) |> f.WithLabel "Year: ")
                 let isDate (month,day,year) = 
                     let pad n (v: string) = v.PadLeft(n,'0')
                     let ymd = sprintf "%s%s%s" (pad 4 year) (pad 2 month) (pad 2 day)
