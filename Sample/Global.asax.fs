@@ -138,9 +138,9 @@ type MvcApplication() =
             let dateFormlet : DateTime Formlet =
                 let baseFormlet = 
                     yields t3
-                    <*> f.LabeledTextBox("Month: ", "", ["size","3"; "maxlength","2"; "type","number"; "min","1"; "max","12"; "required",""])
-                    <*> f.LabeledTextBox("Day: ", "", ["size","3"; "maxlength","2"; "type","number"; "min","1"; "max","31"; "required",""])
-                    <*> f.LabeledTextBox("Year: ", "", ["size","5"; "maxlength","4"; "type","number"; "min","1900"; "required",""])
+                    <*> (f.Text(size = 3, maxlength = 2, required = true, attributes = ["type","number"; "min","1"; "max","12"]) |> f.WithLabel "Month: ")
+                    <*> (f.Text(size = 3, maxlength = 2, required = true, attributes = ["type","number"; "min","1"; "max","31"]) |> f.WithLabel "Day: ")
+                    <*> (f.Text(size = 5, maxlength = 4, required = true, attributes = ["type","number"; "min","1900"]) |> f.WithLabel "Year: ")
                 let isDate (month,day,year) = 
                     DateTime.TryParseExact(sprintf "%s%s%s" year month day, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None) |> fst
                 let dateValidator = err isDate (fun _ -> "Invalid date")
@@ -151,17 +151,17 @@ type MvcApplication() =
             fun ip ->
                 yields (fun f l e d -> 
                             { FirstName = f; LastName = l; Email = e; DateOfBirth = d })
-                <*> (f.LabeledTextBox("First name: ", "", ["required",""]) |> Validate.notEmpty)
+                <*> (f.Text(required = true) |> f.WithLabel "First name: ")
                 <+ e.Br()
-                <*> (f.LabeledTextBox("Last name: ", "", ["required",""]) |> Validate.notEmpty)
+                <*> (f.Text(required = true) |> f.WithLabel "Last name: ")
                 <+ e.Br()
-                <*> (f.LabeledTextBox("Email: ", "", ["type","email"; "required",""]) |> Validate.isEmail)
+                <*> (f.Email(required = true) |> f.WithLabel "Email: ")
                 <+ e.Br()
                 <+ e.Text "Date of birth: " <*> dateFormlet
                 <+ e.Br()
                 <+ e.Text "Please read very carefully these terms and conditions before registering for this online program, blah blah blah"
                 <+ e.Br()
-                <* (f.LabeledCheckBox("I agree to the terms and conditions above", false, []) |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")))
+                <* (f.Checkbox(false) |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")) |> f.WithLabel "I agree to the terms and conditions above")
                 <* reCaptcha ip
 
         let registrationPage form _ =
