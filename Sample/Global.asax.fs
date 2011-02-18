@@ -138,9 +138,9 @@ type MvcApplication() =
             let dateFormlet : DateTime Formlet =
                 let baseFormlet = 
                     yields t3
-                    <*> (f.Text(size = 3, maxlength = 2, required = true, attributes = ["type","number"; "min","1"; "max","12"]) |> f.WithLabel "Month: ")
-                    <*> (f.Text(size = 3, maxlength = 2, required = true, attributes = ["type","number"; "min","1"; "max","31"]) |> f.WithLabel "Day: ")
-                    <*> (f.Text(size = 5, maxlength = 4, required = true, attributes = ["type","number"; "min","1900"]) |> f.WithLabel "Year: ")
+                    <*> (f.Text(size = 3, maxlength = 2, attributes = ["type","number"; "min","1"; "max","12"; "required",""]) |> f.WithLabel "Month: ")
+                    <*> (f.Text(size = 3, maxlength = 2, attributes = ["type","number"; "min","1"; "max","31"; "required",""]) |> f.WithLabel "Day: ")
+                    <*> (f.Text(size = 5, maxlength = 4, attributes = ["type","number"; "min","1900"; "required",""]) |> f.WithLabel "Year: ")
                 let isDate (month,day,year) = 
                     DateTime.TryParseExact(sprintf "%s%s%s" year month day, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None) |> fst
                 let dateValidator = err isDate (fun _ -> "Invalid date")
