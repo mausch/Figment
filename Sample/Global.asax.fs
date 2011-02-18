@@ -138,9 +138,9 @@ type MvcApplication() =
             let dateFormlet : DateTime Formlet =
                 let baseFormlet = 
                     yields t3
-                    <*> (f.Text(maxlength = 2, attributes = ["type","number"; "min","1"; "max","12"; "required",""; "size","3"]) |> f.WithLabel "Month: ")
-                    <*> (f.Text(maxlength = 2, attributes = ["type","number"; "min","1"; "max","31"; "required",""; "size","3"]) |> f.WithLabel "Day: ")
-                    <*> (f.Text(maxlength = 4, attributes = ["type","number"; "min","1900"; "required",""; "size","5"]) |> f.WithLabel "Year: ")
+                    <*> (f.Text(maxlength = 2, attributes = ["type","number"; "min","1"; "max","12"; "required","required"; "size","3"]) |> f.WithLabel "Month: ")
+                    <*> (f.Text(maxlength = 2, attributes = ["type","number"; "min","1"; "max","31"; "required","required"; "size","3"]) |> f.WithLabel "Day: ")
+                    <*> (f.Text(maxlength = 4, attributes = ["type","number"; "min","1900"; "required","required"; "size","5"]) |> f.WithLabel "Year: ")
                 let isDate (month,day,year) = 
                     let pad n (v: string) = v.PadLeft(n,'0')
                     let ymd = sprintf "%s%s%s" (pad 4 year) (pad 2 month) (pad 2 day)
@@ -166,6 +166,12 @@ type MvcApplication() =
                 <* (f.Checkbox(false) |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")) |> f.WithLabel "I agree to the terms and conditions above")
                 <* reCaptcha ip
 
+        let jsValidation = 
+            e.Div [
+                s.JavascriptFile "http://cdn.jquerytools.org/1.2.5/full/jquery.tools.min.js"
+                e.Script [ &"$('form').validator();" ]
+            ]
+
         let registrationPage form _ =
             layout "Registration" [
                 s.FormPost "" [
@@ -176,6 +182,7 @@ type MvcApplication() =
                         yield s.Submit "Register!"
                     ]
                 ]
+                jsValidation
             ]
 
         get "thankyou" (fun ctx -> Result.contentf "Thank you for registering, %s %s" ctx.QueryString.["f"] ctx.QueryString.["l"])
