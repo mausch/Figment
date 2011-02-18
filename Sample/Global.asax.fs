@@ -142,7 +142,9 @@ type MvcApplication() =
                     <*> (f.Text(size = 3, maxlength = 2, attributes = ["type","number"; "min","1"; "max","31"; "required",""]) |> f.WithLabel "Day: ")
                     <*> (f.Text(size = 5, maxlength = 4, attributes = ["type","number"; "min","1900"; "required",""]) |> f.WithLabel "Year: ")
                 let isDate (month,day,year) = 
-                    DateTime.TryParseExact(sprintf "%s%s%s" year month day, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None) |> fst
+                    let pad n (v: string) = v.PadLeft(n,'0')
+                    let ymd = sprintf "%s%s%s" (pad 4 year) (pad 2 month) (pad 2 day)
+                    DateTime.TryParseExact(ymd, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None) |> fst
                 let dateValidator = err isDate (fun _ -> "Invalid date")
                 baseFormlet 
                 |> satisfies dateValidator
