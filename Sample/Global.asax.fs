@@ -24,6 +24,7 @@ open Figment.Extensions
 type PersonalInfo = {
     Name: string
     Email: string
+    Password: string
     DateOfBirth: DateTime
 }
 
@@ -42,7 +43,7 @@ type MvcApplication() =
 
         // applying cache, showing a regular ASP.NET MVC view
         let cache300 = cache (OutputCacheParameters(Duration = 300, Location = OutputCacheLocation.Any))
-        get "showform" (cache300 <| view "sampleform" { Name = "Cacho Castaña"; Email = ""; DateOfBirth = DateTime.MinValue })
+        get "showform" (cache300 <| view "sampleform" { Name = "Cacho Castaña"; Email = ""; Password = ""; DateOfBirth = DateTime.MinValue })
 
         // handle post to "action6"
         // first, a regular function
@@ -150,11 +151,13 @@ type MvcApplication() =
                 |> map (fun (month,day,year) -> DateTime(int year,int month,int day))
 
             fun ip ->
-                yields (fun n e d -> 
-                            { Name = n; Email = e; DateOfBirth = d })
+                yields (fun n e p d -> 
+                            { Name = n; Email = e; Password = p; DateOfBirth = d })
                 <*> (f.Text(required = true) |> f.WithLabel "Name: ")
                 <+ e.Br()
                 <*> (f.Email(required = true) |> f.WithLabel "Email: ")
+                <+ e.Br()
+                <*> (f.Password(required = true) |> f.WithLabel "Password: ")
                 <+ e.Br()
                 <+ e.Text "Date of birth: " <*> dateFormlet
                 <+ e.Br()
