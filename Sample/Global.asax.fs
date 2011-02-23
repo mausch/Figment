@@ -22,8 +22,7 @@ open WingBeats.Formlets
 open Figment.Extensions
 
 type PersonalInfo = {
-    FirstName: string
-    LastName: string
+    Name: string
     Email: string
     DateOfBirth: DateTime
 }
@@ -43,7 +42,7 @@ type MvcApplication() =
 
         // applying cache, showing a regular ASP.NET MVC view
         let cache300 = cache (OutputCacheParameters(Duration = 300, Location = OutputCacheLocation.Any))
-        get "showform" (cache300 <| view "sampleform" { FirstName = "Cacho"; LastName = "Castaña"; Email = ""; DateOfBirth = DateTime.MinValue })
+        get "showform" (cache300 <| view "sampleform" { Name = "Cacho Castaña"; Email = ""; DateOfBirth = DateTime.MinValue })
 
         // handle post to "action6"
         // first, a regular function
@@ -151,11 +150,9 @@ type MvcApplication() =
                 |> map (fun (month,day,year) -> DateTime(int year,int month,int day))
 
             fun ip ->
-                yields (fun f l e d -> 
-                            { FirstName = f; LastName = l; Email = e; DateOfBirth = d })
-                <*> (f.Text(required = true) |> f.WithLabel "First name: ")
-                <+ e.Br()
-                <*> (f.Text(required = true) |> f.WithLabel "Last name: ")
+                yields (fun n e d -> 
+                            { Name = n; Email = e; DateOfBirth = d })
+                <*> (f.Text(required = true) |> f.WithLabel "Name: ")
                 <+ e.Br()
                 <*> (f.Email(required = true) |> f.WithLabel "Email: ")
                 <+ e.Br()
@@ -185,12 +182,12 @@ type MvcApplication() =
                 jsValidation
             ]
 
-        get "thankyou" (fun ctx -> Result.contentf "Thank you for registering, %s %s" ctx.QueryString.["f"] ctx.QueryString.["l"])
+        get "thankyou" (fun ctx -> Result.contentf "Thank you for registering, %s" ctx.QueryString.["n"])
             
         formAction "register" {
             Formlet = fun ctx -> registrationFormlet ctx.IP
             Page = registrationPage
-            Success = fun _ v -> Result.redirectf "thankyou?f=%s&l=%s" v.FirstName v.LastName
+            Success = fun _ v -> Result.redirectf "thankyou?n=%s" v.Name
         }
 
         action any (status 404 => content "<h1>Not found!</h1>")
