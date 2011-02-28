@@ -168,6 +168,17 @@ type MvcApplication() =
                 f.Password(required = true)
                 |> satisfies (err isOK (fun _ -> "Password too weak"))
 
+            let doublePassword =
+                let f =
+                    yields t2
+                    <*> (password |> f.WithLabel "Password: ")
+                    <+ e.Br()
+                    <*> (password |> f.WithLabel "Repeat password: ")
+                let isOK (a,b) = a = b
+                f
+                |> satisfies (err isOK (fun _ -> "Passwords don't match"))
+                |> map fst
+
             fun ip ->
                 yields (fun n e p d -> 
                             { Name = n; Email = e; Password = p; DateOfBirth = d })
@@ -175,7 +186,7 @@ type MvcApplication() =
                 <+ e.Br()
                 <*> (f.Email(required = true) |> f.WithLabel "Email: ")
                 <+ e.Br()
-                <*> (password |> f.WithLabel "Password: ")
+                <*> doublePassword
                 <+ e.Br()
                 <+ e.Text "Date of birth: " <*> dateFormlet
                 <+ e.Br()
