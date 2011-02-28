@@ -3,7 +3,10 @@
 open System
 open System.Collections.Specialized
 open System.Diagnostics
+open System.IO
+open System.IO.Compression
 open System.Globalization
+open System.Text.RegularExpressions
 open System.Net
 open System.Web
 open System.Web.Mvc
@@ -27,6 +30,7 @@ type PersonalInfo = {
     Password: string
     DateOfBirth: DateTime
 }
+                        
 
 type MvcApplication() =
     inherit HttpApplication()
@@ -133,6 +137,7 @@ type MvcApplication() =
         let s = e.Shortcut
         let f = e.Formlets
         let registrationFormlet =
+
             let reCaptcha = reCaptcha {PublicKey = "6LfbkMESAAAAAPBL8AK4JhtzHMgcRez3UlQ9FZkz"; PrivateKey = "6LfbkMESAAAAANzdOHD_A6uZwAplnJCoiL2F6hEF"; MockedResult = None}
 
             let dateFormlet : DateTime Formlet =
@@ -150,6 +155,19 @@ type MvcApplication() =
                 |> satisfies dateValidator
                 |> map (fun (month,day,year) -> DateTime(int year,int month,int day))
 
+            let password =
+                // http://bugsquash.blogspot.com/2011/02/password-strength-entropy-and.html
+                let compressedLength (s: string) =
+                    use buffer = new MemoryStream()
+                    use comp = new DeflateStream(buffer, CompressionMode.Compress)
+                    use w = new StreamWriter(comp)
+                    w.Write(s)
+                    w.Flush()
+                    buffer.Length
+                let isOK s = compressedLength s >= 106L
+                f.Password(required = true)
+                |> satisfies (err isOK (fun _ -> "Password too weak"))
+
             fun ip ->
                 yields (fun n e p d -> 
                             { Name = n; Email = e; Password = p; DateOfBirth = d })
@@ -157,7 +175,7 @@ type MvcApplication() =
                 <+ e.Br()
                 <*> (f.Email(required = true) |> f.WithLabel "Email: ")
                 <+ e.Br()
-                <*> (f.Password(required = true) |> f.WithLabel "Password: ")
+                <*> (password |> f.WithLabel "Password: ")
                 <+ e.Br()
                 <+ e.Text "Date of birth: " <*> dateFormlet
                 <+ e.Br()
