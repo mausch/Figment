@@ -155,7 +155,7 @@ type MvcApplication() =
                 |> satisfies dateValidator
                 |> map (fun (month,day,year) -> DateTime(int year,int month,int day))
 
-            let password =
+            let doublePassword =
                 // http://bugsquash.blogspot.com/2011/02/password-strength-entropy-and.html
                 let compressedLength (s: string) =
                     use buffer = new MemoryStream()
@@ -164,20 +164,17 @@ type MvcApplication() =
                     w.Write(s)
                     w.Flush()
                     buffer.Length
-                let isOK s = compressedLength s >= 106L
-                f.Password(required = true)
-                |> satisfies (err isOK (fun _ -> "Password too weak"))
-
-            let doublePassword =
+                let isStrong s = compressedLength s >= 106L
                 let f =
                     yields t2
-                    <*> (password |> f.WithLabel "Password: ")
+                    <*> (f.Password(required = true) |> f.WithLabel "Password: ")
                     <+ e.Br()
-                    <*> (password |> f.WithLabel "Repeat password: ")
-                let isOK (a,b) = a = b
+                    <*> (f.Password(required = true) |> f.WithLabel "Repeat password: ")
+                let areEqual (a,b) = a = b
                 f
-                |> satisfies (err isOK (fun _ -> "Passwords don't match"))
+                |> satisfies (err areEqual (fun _ -> "Passwords don't match"))
                 |> map fst
+                |> satisfies (err isStrong (fun _ -> "Password too weak"))
 
             fun ip ->
                 yields (fun n e p d -> 
@@ -211,7 +208,7 @@ type MvcApplication() =
                         yield s.Submit "Register!"
                     ]
                 ]
-                jsValidation
+                //jsValidation
             ]
 
         get "thankyou" (fun ctx -> Result.contentf "Thank you for registering, %s" ctx.QueryString.["n"])
