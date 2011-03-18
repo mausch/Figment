@@ -11,7 +11,7 @@ module FormletsExtensions =
 
     type 'a FormActionParameters = {
         Formlet: ControllerContext -> 'a Formlet
-        Page: XNode list -> ControllerContext -> Node list
+        Page: ControllerContext -> XNode list -> Node list
         Success: ControllerContext -> 'a -> ActionResult
     }
 
@@ -26,11 +26,11 @@ module FormletsExtensions =
         get url 
             (fun ctx -> 
                 let xml = p.Formlet ctx |> renderToXml
-                p.Page xml ctx |> Result.wbview)
+                p.Page ctx xml |> Result.wbview)
         post url
             (fun ctx -> 
                 let env = EnvDict.fromFormAndFiles ctx.HttpContext.Request
                 match run (p.Formlet ctx) env with
                 | Success v -> p.Success ctx v
-                | Failure(errorForm, _) -> p.Page errorForm ctx |> Result.wbview)
+                | Failure(errorForm, _) -> p.Page ctx errorForm |> Result.wbview)
 

@@ -198,7 +198,7 @@ type MvcApplication() =
                 e.Script [ &"$('form').validator();" ]
             ]
 
-        let registrationPage form _ =
+        let registrationPage form =
             layout "Registration" [
                 s.FormPost "" [
                     e.Fieldset [
@@ -215,7 +215,7 @@ type MvcApplication() =
             
         formAction "register" {
             Formlet = fun ctx -> registrationFormlet ctx.IP
-            Page = registrationPage
+            Page = fun _ -> registrationPage
             Success = fun _ v -> Result.redirectf "thankyou?n=%s" v.Name
         }
 
