@@ -185,9 +185,9 @@ type MvcApplication() =
                 <+ e.Br()
                 <*> doublePassword
                 <+ e.Br()
-                <+ e.Text "Date of birth: " <*> dateFormlet
+                <+ &"Date of birth: " <*> dateFormlet
                 <+ e.Br()
-                <+ e.Text "Please read very carefully these terms and conditions before registering for this online program, blah blah blah"
+                <+ &"Please read very carefully these terms and conditions before registering for this online program, blah blah blah"
                 <+ e.Br()
                 <* (f.Checkbox(false) |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")) |> f.WithLabel "I agree to the terms and conditions above")
                 <* reCaptcha ip
