@@ -189,7 +189,7 @@ type MvcApplication() =
                 <+ e.Br()
                 <+ &"Please read very carefully these terms and conditions before registering for this online program, blah blah blah"
                 <+ e.Br()
-                <* (f.Checkbox(false) |> satisfies (err ((=) true) (fun _ -> "Please accept the terms and conditions")) |> f.WithLabel "I agree to the terms and conditions above")
+                <* (f.Checkbox(false) |> satisfies (err id (fun _ -> "Please accept the terms and conditions")) |> f.WithLabel "I agree to the terms and conditions above")
                 <* reCaptcha ip
 
         let jsValidation = 
