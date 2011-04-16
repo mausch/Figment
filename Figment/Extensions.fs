@@ -11,6 +11,12 @@ open System.Text.RegularExpressions
 open System.Web.Caching
 
 module Extensions = 
+    let internal bindingFlags = BindingFlags.NonPublic ||| BindingFlags.Instance
+    let internal underlyingRequest = typeof<HttpRequestWrapper>.GetField("_httpRequest", bindingFlags)
+    let internal httpRequestFlags = typeof<HttpRequest>.GetField("_flags", bindingFlags)
+    let internal simpleBitVectorClear = httpRequestFlags.FieldType.GetMethod("Clear", bindingFlags)
+    let internal simpleBitVectorIntValueSet = httpRequestFlags.FieldType.GetProperty("IntegerValue", bindingFlags)
+    let internal formValidation = 2
 
     type CaptureCollection with
         member this.Captures 
@@ -62,6 +68,11 @@ module Extensions =
         member x.files =
             x.Files.AllKeys
             |> Seq.map (fun k -> k, x.Files.[k])
+        member x.DisableValidation() =
+            let httpRequest = underlyingRequest.GetValue(x)
+            let flags = httpRequestFlags.GetValue(httpRequest)
+            simpleBitVectorIntValueSet.SetValue(flags, 0, null)
+            httpRequestFlags.SetValue(httpRequest, flags)
 
     type HttpSessionStateBase with
         member x.Get (n: string) = unbox x.[n]

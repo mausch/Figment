@@ -8,10 +8,13 @@ open System.Web.Routing
 open Figment.Helpers
 
 open System.Diagnostics
+open Extensions
 
 type FigmentHandler(context: RequestContext, action: FAction) =
     member this.ProcessRequest(ctx: HttpContextBase) = 
         let controller = Helper.BuildControllerFromAction action
+        ctx.Request.DisableValidation() |> ignore
+        controller.ValidateRequest <- false
         (controller :> IController).Execute context
 
     interface System.Web.SessionState.IRequiresSessionState
@@ -23,6 +26,8 @@ type FigmentHandler(context: RequestContext, action: FAction) =
 type FigmentAsyncHandler(context: RequestContext, action: FAsyncAction) = 
     member this.ProcessRequest(ctx: HttpContextBase) = 
         let controller = Helper.BuildControllerFromAsyncAction action
+        ctx.Request.DisableValidation() |> ignore
+        controller.ValidateRequest <- false
         (controller :> IController).Execute context
 
     interface System.Web.SessionState.IRequiresSessionState
