@@ -15,7 +15,11 @@ module Actions =
 
 [<AutoOpen>]
 module XhtmlElementExtensions = 
-    type WingBeats.Xhtml.XhtmlElement with
+    open WingBeats.Xhtml
+
+    let internal e = XhtmlElement()
+
+    type XhtmlElement with
         member x.DocTypeTransitional = 
             DocType({ name   = "html"
                       pubid  = "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -28,3 +32,6 @@ module XhtmlElementExtensions =
                       sysid  = null
                       subset = null })
     //<!DOCTYPE html>
+
+    type Shortcuts.XhtmlShortcut with
+        member x.Link href text = e.A ["href",href] [&text]

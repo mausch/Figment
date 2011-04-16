@@ -102,6 +102,13 @@ type MvcApplication() =
 
         action ifGetDsl (wbpageview "You're using Internet Explorer")
 
+        // http://www.paulgraham.com/arcchallenge.html
+        let s = e.Shortcut
+        let k,url,url2 = "s","said","showsaid"
+        get url (wbview [s.FormPost url [e.Input ["name",k]; s.Submit "Send"]])
+        post url (fun ctx -> (k, ctx.Form.[k]) ||> ctx.Session.Set; Result.wbview [s.Link url2 "click here"])
+        get url2 (fun ctx -> Result.wbview [&ctx.Session.Get(k)])
+
         // async
         let google (ctx: ControllerContext) = async {
             Debug.WriteLine "Start async action"

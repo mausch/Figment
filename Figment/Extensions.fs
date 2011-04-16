@@ -64,6 +64,8 @@ module Extensions =
             |> Seq.map (fun k -> k, x.Files.[k])
 
     type HttpSessionStateBase with
+        member x.Get (n: string) = unbox x.[n]
+        member x.Set (n: string) v = x.[n] <- v
         member x.asDict =
             let notimpl() = raise <| NotImplementedException()
             let getEnumerator() =
@@ -132,4 +134,8 @@ module Extensions =
         member x.SessionDict = x.Session.asDict
         member x.Request = x.HttpContext.Request
         member x.QueryString = x.Request.QueryString
+        member x.Form = x.Request.Form
         member x.IP = x.Request.UserHostAddress
+        member x.GetValue n = 
+            let r = x.Controller.ValueProvider.GetValue n
+            unbox r.RawValue
