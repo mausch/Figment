@@ -81,6 +81,8 @@ type MvcApplication() =
 
         // wing beats integration
         let e = XhtmlElement()
+        let s = e.Shortcut
+        let f = e.Formlets
         let wbpage title = 
             [e.Html [
                 e.Head [
@@ -103,16 +105,31 @@ type MvcApplication() =
         action ifGetDsl (wbpageview "You're using Internet Explorer")
 
         // http://www.paulgraham.com/arcchallenge.html
-        let s = e.Shortcut
-        let k,url,url2 = "s","said","showsaid"
-        get url (wbview [s.FormPost url [e.Input ["name",k]; s.Submit "Send"]])
-        post url (fun ctx -> (k, ctx.Form.[k]) ||> ctx.Session.Set; Result.wbview [s.Link url2 "click here"])
-        get url2 (fun ctx -> Result.wbview [&ctx.Session.Get(k)])
+        let arcChallenge() =            
+            let k,url,url2 = "s","said","showsaid"
+            get url (wbview [s.FormPost url [e.Input ["name",k]; s.Submit "Send"]])
+            post url (fun ctx -> (k, ctx.Form.[k]) ||> ctx.Session.Set; Result.wbview [s.Link url2 "click here"])
+            get url2 (fun ctx -> Result.wbview [&ctx.Session.Get(k)])
+        //arcChallenge()
+
+        // http://www.paulgraham.com/arcchallenge.html
+        let arcChallenge2() =
+            let getpost url formlet action =
+                let page _ form = [s.FormPost url [yield!!+ form; yield s.Submit "Send"]]
+                formAction url {
+                    Formlet = fun _ -> formlet
+                    Page = page
+                    Success = action
+                }
+            let k,url = "s","showsaid"
+            getpost "said" (f.Text()) (fun ctx v -> ctx.Session.Set k v; Result.wbview [s.Link url "click here"])
+            get url (fun ctx -> Result.wbview [&ctx.Session.Get(k)])
+        arcChallenge2()
 
         // async
         let google (ctx: ControllerContext) = async {
             Debug.WriteLine "Start async action"
-            let query = ctx.HttpContext.Request.Url.Segments.[2]
+            let query = ctx.Url.Segments.[2]
             let query = HttpUtility.UrlEncode query
             use web = new WebClient()
             let! content = web.AsyncDownloadString(Uri("http://www.google.com/search?q=" + query))
@@ -141,8 +158,6 @@ type MvcApplication() =
                 ]
             ]
 
-        let s = e.Shortcut
-        let f = e.Formlets
         let registrationFormlet =
 
             let reCaptcha = reCaptcha {PublicKey = "6LfbkMESAAAAAPBL8AK4JhtzHMgcRez3UlQ9FZkz"; PrivateKey = "6LfbkMESAAAAANzdOHD_A6uZwAplnJCoiL2F6hEF"; MockedResult = None}
