@@ -16,6 +16,9 @@ let (=>) = concat
 let content str (ctx: ControllerContext) = 
     Result.content str
 
+let contentf fmt (ctx: ControllerContext) = 
+    Printf.kprintf Result.content fmt    
+
 let redirect str (ctx: ControllerContext) = 
     Result.redirect str
 
