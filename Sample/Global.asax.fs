@@ -124,7 +124,38 @@ type MvcApplication() =
             let k,url = "s","showsaid"
             getpost "said" (f.Text()) (fun ctx v -> ctx.Session.Set k v; Result.wbview [s.Link url "click here"])
             get url (fun ctx -> Result.wbview [&ctx.Session.Get(k)])
-        arcChallenge2()
+        //arcChallenge2()
+
+        let arcChallenge3() =
+            let url = "said"
+            let hiddenContField = "_k"
+            let hiddenCont v = tag "input" ["name", hiddenContField; "type","hidden"; "value",losSerializer.Serialize v] nop
+            let formlet a = form "post" url [] (input "" [] <* hiddenCont a <* submit "Send" [])
+            let formletCont (v: obj, cont: obj -> ControllerContext -> ActionResult) = formlet (v,cont)
+            let contAction (ctx: ControllerContext) : ActionResult =
+                let (v,cont) = losSerializer.Deserialize ctx.Request.[hiddenContField] |> unbox
+                cont v ctx
+
+            let post2 (firstName: obj) (ctx: ControllerContext) =
+                let env = EnvDict.fromFormAndFiles ctx.Request
+                let vformlet = formlet ()
+                match run vformlet env with
+                | Success lastName ->
+                    Result.contentf "Hello %s %s" (string firstName) lastName
+                | _ -> failwith "ohnoes"
+
+            let post1 _ (ctx: ControllerContext) =
+                let env = EnvDict.fromFormAndFiles ctx.Request
+                let vformlet = formlet ()
+                match run vformlet env with
+                | Success firstName ->
+                    Result.content (render (formletCont (firstName,post2)))
+                | _ -> failwith "ohnoes"
+                
+            get url (fun ctx -> Result.content (render (formletCont (0,post1))))
+            post url contAction
+
+        arcChallenge3()
 
         // async
         let google (ctx: ControllerContext) = async {
