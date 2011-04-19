@@ -131,23 +131,20 @@ type MvcApplication() =
             let hiddenContField = "_k"
             let hiddenCont v = tag "input" ["name", hiddenContField; "type","hidden"; "value",losSerializer.Serialize v] nop
             let formlet a = form "post" url [] (input "" [] <* hiddenCont a <* submit "Send" [])
+            let vformlet = formlet ()
             let formletCont (v: obj, cont: obj -> ControllerContext -> ActionResult) = formlet (v,cont)
             let contAction (ctx: ControllerContext) : ActionResult =
                 let (v,cont) = losSerializer.Deserialize ctx.Request.[hiddenContField] |> unbox
                 cont v ctx
 
             let post2 (firstName: obj) (ctx: ControllerContext) =
-                let env = EnvDict.fromFormAndFiles ctx.Request
-                let vformlet = formlet ()
-                match run vformlet env with
+                match runForm vformlet ctx with
                 | Success lastName ->
                     Result.contentf "Hello %s %s" (string firstName) lastName
                 | _ -> failwith "ohnoes"
 
             let post1 _ (ctx: ControllerContext) =
-                let env = EnvDict.fromFormAndFiles ctx.Request
-                let vformlet = formlet ()
-                match run vformlet env with
+                match runForm vformlet ctx with
                 | Success firstName ->
                     Result.formlet (formletCont (firstName,post2))
                 | _ -> failwith "ohnoes"

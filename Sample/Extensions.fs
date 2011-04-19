@@ -48,6 +48,10 @@ module FormletsExtensions =
     open Figment.Routing
     open Formlets
 
+    let runForm formlet (ctx: ControllerContext) =
+        let env = EnvDict.fromFormAndFiles ctx.HttpContext.Request
+        run formlet env
+
     type 'a FormActionParameters = {
         Formlet: ControllerContext -> 'a Formlet
         Page: ControllerContext -> XNode list -> Node list
@@ -68,8 +72,7 @@ module FormletsExtensions =
                 p.Page ctx xml |> Result.wbview)
         post url
             (fun ctx -> 
-                let env = EnvDict.fromFormAndFiles ctx.HttpContext.Request
-                match run (p.Formlet ctx) env with
+                match runForm (p.Formlet ctx) ctx with
                 | Success v -> p.Success ctx v
                 | Failure(errorForm, _) -> p.Page ctx errorForm |> Result.wbview)
 
