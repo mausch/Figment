@@ -101,7 +101,7 @@ module FormletsExtensions =
         assignedHidden stateField v *> f
     let internal aform nexturl formlet = form "post" nexturl [] formlet
 
-    let formletAction nextUrl (f: _ Formlet) (a: FormletAction<_,_,_,_>) : Helpers.FAction =
+    let formletToAction nextUrl (f: _ Formlet) (a: FormletAction<_,_,_,_>) : Helpers.FAction =
         fun ctx ->
             let s = getState ctx
             match runParams f ctx with
@@ -112,8 +112,11 @@ module FormletsExtensions =
                 Result.formlet formlet
             | _ -> failwith "bla"
 
-    let getFormlet url nextUrl thisFormlet (a: FormletAction<_,_,_,_>) =
-        get url (formletAction nextUrl thisFormlet a)
+    let getFormlet url nextUrl thisFormlet a =
+        get url (formletToAction nextUrl thisFormlet a)
 
-    let postFormlet url nextUrl thisFormlet (a: FormletAction<_,_,_,_>) =
-        post url (formletAction nextUrl thisFormlet a)
+    let postFormlet url nextUrl thisFormlet a =
+        post url (formletToAction nextUrl thisFormlet a)
+
+    let actionFormlet hmethod url nextUrl thisFormlet a =
+        register hmethod url (formletToAction nextUrl thisFormlet a)
