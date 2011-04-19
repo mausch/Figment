@@ -173,6 +173,21 @@ type MvcApplication() =
         //continuation2()
 
         let continuation3() =
+            let formlet url a = form "post" url [] (yields t2 <*> pickler a <*> input "" [] <* submit "Send" [])
+            let cc =
+                web {
+                    let! firstName = showFormlet formlet
+                    let! lastName = showFormlet formlet
+                    do! showContent (sprintf "Hello %s %s" firstName lastName)
+                    //return showContent2 (sprintf "Hello %s %s" firstName lastName)
+                }
+            let fff = cc GET "name" ()
+            let cce = 
+                let (>>=) b a = web.Bind(b,a)
+                showFormlet formlet >>= fun firstName ->
+                showFormlet formlet >>= fun lastName ->
+                showContent (sprintf "Hello %s %s" firstName lastName)
+            let fff2 = cce GET "name"
             ()
 
         // async

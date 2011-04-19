@@ -76,3 +76,31 @@ module FormletsExtensions =
                 | Success v -> p.Success ctx v
                 | Failure(errorForm, _) -> p.Page ctx errorForm |> Result.wbview)
 
+
+    type Web<'a,'b> = HttpMethod -> string -> 'a -> 'b Formlet
+    type WebBuilder() =
+        member x.Bind(a: Web<_,_>, f: _ -> Web<_,_>) : Web<_,_> = 
+            fun hmethod url state ->
+                let formlet = a hmethod url state
+
+                failwith "bind"
+        member x.Return(a: 'a) : Web<_,_> = 
+            fun hmethod url state -> puree a
+
+    let web = WebBuilder()
+
+    let registerFormlet hmethod url formlet =
+        register hmethod url (fun ctx -> Result.formlet formlet)
+
+    let showFormlet (f: string -> 'a -> ('a * 'b) Formlet) : Web<_,_> =
+        fun hmethod url state ->
+            let nextUrl = url + "1"
+            let formlet = f nextUrl state
+            //registerFormlet hmethod url formlet
+            formlet
+    
+    let showContent (content: string): Web<_,_> =
+        fun hmethod url state -> text content
+
+    let showContent2 (content: string): unit =
+        failwith "showContent2"
