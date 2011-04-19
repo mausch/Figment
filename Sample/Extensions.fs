@@ -76,11 +76,11 @@ module FormletsExtensions =
                 | Success v -> p.Success ctx v
                 | Failure(errorForm, _) -> p.Page ctx errorForm |> Result.wbview)
 
-    type FormletAction<'a,'b> = 'a -> ControllerContext -> 'b Formlet
+    type FormletAction<'a,'b> = ControllerContext -> 'a -> 'b Formlet
 
     let formletActionToFAction (a: FormletAction<_,_>) (f: _ Formlet) : Helpers.FAction =
         fun ctx ->
             match runForm f ctx with
-            | Success v -> a v ctx |> Result.formlet
+            | Success v -> a ctx v |> Result.formlet
             | _ -> failwith "bla"
 
