@@ -174,15 +174,12 @@ type MvcApplication() =
 
         let continuation3() =
             let formletpost2 (firstname, lastname) = textf "Hello %s %s" firstname lastname
-            let post2 (ctx: ControllerContext) = formletpost2
             let formletpost1 (n: string) = form "post" "name2" [] (yields t2 <*> pickler n <*> input "" [] <* submit "Send" [])
-            let post1 (ctx: ControllerContext) = formletpost1
             let formletget1 = form "post" "name1" [] (input "" [] <* submit "Send" [])
-            let get1 (ctx: ControllerContext) () = formletget1
 
-            get "name" (formletActionToFAction get1 nop)
-            post "name1" (formletActionToFAction post1 formletget1)
-            post "name2" (formletActionToFAction post2 (formletpost1 ""))
+            get "name" (formletActionToFAction (fun _ _ -> formletget1) nop)
+            post "name1" (formletActionToFAction (fun _ -> formletpost1) formletget1)
+            post "name2" (formletActionToFAction (fun _ -> formletpost2) (formletpost1 ""))
 
         continuation3()
 
