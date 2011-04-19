@@ -173,11 +173,13 @@ type MvcApplication() =
         //continuation2()
 
         let continuation3() =
-            let formlet = input "" [] <* submit "Send" []
+            let inputsend = input "" [] <* submit "Send" []
+            let ffirstname = text "First name:" *> inputsend
+            let flastname = text "Last name:" *> inputsend
 
-            get "name" (formletAction "name1" nop (fun _ _ _ -> (),formlet))
-            post "name1" (formletAction "name2" formlet (fun _ _ firstname -> firstname,formlet))
-            post "name2" (formletAction "" formlet (fun _ firstname lastname -> (),textf "Hello %s %s" firstname lastname))
+            get "name" (formletAction "name1" nop (fun _ _ _ -> (),ffirstname))
+            post "name1" (formletAction "name2" ffirstname (fun _ _ firstname -> firstname,flastname))
+            post "name2" (formletAction "" flastname (fun _ firstname lastname -> (),textf "Hello %s %s" firstname lastname))
 
         continuation3()
 
