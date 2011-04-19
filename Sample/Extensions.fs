@@ -46,18 +46,19 @@ module FormletsExtensions =
     open System.Web.Mvc
     open WingBeats.Xml
     open Figment.Routing
+    open Figment.Extensions
     open Formlets
 
     let runPost formlet (ctx: ControllerContext) =
-        let env = EnvDict.fromFormAndFiles ctx.HttpContext.Request
+        let env = EnvDict.fromFormAndFiles ctx.Request
         run formlet env
 
     let runGet formlet (ctx: ControllerContext) =
-        let env = EnvDict.fromNV ctx.HttpContext.Request.QueryString
+        let env = EnvDict.fromNV ctx.QueryString
         run formlet env
 
     let runParams formlet (ctx: ControllerContext) =
-        let env = EnvDict.fromNV ctx.HttpContext.Request.Params
+        let env = EnvDict.fromNV ctx.Request.Params
         run formlet env
 
     type 'a FormActionParameters = {
@@ -84,11 +85,30 @@ module FormletsExtensions =
                 | Success v -> p.Success ctx v
                 | Failure(errorForm, _) -> p.Page ctx errorForm |> Result.wbview)
 
-    type FormletAction<'a,'b> = ControllerContext -> 'a -> 'b Formlet
+    /// <summary>
+    /// 'a : state
+    /// 'b : form result
+    /// 'c : new state
+    /// 'd : formlet type
+    /// </summary>
+    type FormletAction<'a,'b,'c,'d> = ControllerContext -> 'a -> 'b -> ('c * 'd Formlet)
 
-    let formletActionToFAction (a: FormletAction<_,_>) (f: _ Formlet) : Helpers.FAction =
+    let internal stateField = "_state"
+    let internal getState (ctx: ControllerContext) =
+        ctx.Request.Params.[stateField] |> losSerializer.Deserialize |> unbox
+    let internal setState v (f: _ Formlet) =
+        let v = losSerializer.Serialize v
+        assignedHidden stateField v *> f
+    let internal aform nexturl formlet = form "post" nexturl [] formlet
+
+    let formletAction nextUrl (f: _ Formlet) (a: FormletAction<_,_,_,_>) : Helpers.FAction =
         fun ctx ->
-            match runPost f ctx with
-            | Success v -> a ctx v |> Result.formlet
+            let s = getState ctx
+            match runParams f ctx with
+            | Success v -> 
+                let newState, formlet = a ctx s v
+                let formlet = setState newState formlet
+                let formlet = aform nextUrl formlet
+                Result.formlet formlet
             | _ -> failwith "bla"
 
