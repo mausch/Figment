@@ -173,23 +173,23 @@ type MvcApplication() =
         //continuation2()
 
         let continuation3() =
-            //let formlet url a = form "post" url [] (yields t2 <*> pickler a <*> input "" [] <* submit "Send" [])
-            let post2 (firstname,lastname) (ctx: ControllerContext) = 
-                textf "Hello %s %s" firstname lastname
-            let post1 (firstname: string) (ctx: ControllerContext) =
-                form "post" "name2" [] (yields t2 <*> pickler firstname <*> input "" [] <* submit "Send" [])
-            let get1 () (ctx: ControllerContext) =
-                form "post" "name1" [] (input "" [] <* submit "Send" [])
+            let formletpost2 (firstname, lastname) = textf "Hello %s %s" firstname lastname
+            let post2 (firstname,lastname) (ctx: ControllerContext) = formletpost2 (firstname,lastname)
+            let formletpost1 (n: string) = form "post" "name2" [] (yields t2 <*> pickler n <*> input "" [] <* submit "Send" [])
+            let post1 (firstname: string) (ctx: ControllerContext) = formletpost1 firstname
+            let formletget1 = form "post" "name1" [] (input "" [] <* submit "Send" [])
+            let get1 () (ctx: ControllerContext) = formletget1
 
             let aget1 x = formletActionToFAction get1 nop x
-            let apost1 x = formletActionToFAction post1 (input "" []) x
-            let apost2 x = formletActionToFAction post2 (yields t2 <*> pickler "" <*> input "" []) x
+            let apost1 x = formletActionToFAction post1 formletget1 x
+            let apost2 x = formletActionToFAction post2 (formletpost1 "") x
 
             get "name" aget1
             post "name1" apost1
             post "name2" apost2
 
         continuation3()
+
 
         // async
         let google (ctx: ControllerContext) = async {
