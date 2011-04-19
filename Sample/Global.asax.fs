@@ -139,13 +139,13 @@ type MvcApplication() =
                 cont v ctx
 
             let post2 (firstName: obj) (ctx: ControllerContext) =
-                match runForm vformlet ctx with
+                match runPost vformlet ctx with
                 | Success lastName ->
                     Result.contentf "Hello %s %s" (string firstName) lastName
                 | _ -> failwith "ohnoes"
 
             let post1 _ (ctx: ControllerContext) =
-                match runForm vformlet ctx with
+                match runPost vformlet ctx with
                 | Success firstName ->
                     Result.formlet (formletCont (firstName,post2))
                 | _ -> failwith "ohnoes"
@@ -160,13 +160,13 @@ type MvcApplication() =
             post "post2"
                 (fun ctx ->
                     let vformlet = formlet "" ""
-                    match runForm vformlet ctx with
+                    match runPost vformlet ctx with
                     | Success (firstName,lastName) -> Result.contentf "Hello %s %s" firstName lastName
                     | _ -> failwith "bla")
             post "post1"
                 (fun ctx ->
                     let vformlet = formlet "" ()
-                    match runForm vformlet ctx with
+                    match runPost vformlet ctx with
                     | Success (_,firstName) -> Result.formlet (formlet "post2" firstName)
                     | _ -> failwith "bla")
             get "name" (fun _ -> Result.formlet (formlet "post1" ()))
