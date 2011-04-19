@@ -149,10 +149,10 @@ type MvcApplication() =
                 let vformlet = formlet ()
                 match run vformlet env with
                 | Success firstName ->
-                    Result.content (render (formletCont (firstName,post2)))
+                    Result.formlet (formletCont (firstName,post2))
                 | _ -> failwith "ohnoes"
                 
-            get url (fun ctx -> Result.content (render (formletCont (0,post1))))
+            get url (fun ctx -> Result.formlet (formletCont (0,post1)))
             post url contAction
 
         arcChallenge3()

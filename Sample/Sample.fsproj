@@ -42,8 +42,7 @@
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />
   <ItemGroup>
     <Content Include="web.config" />
-    <Compile Include="WingBeatsExtensions.fs" />
-    <Compile Include="FormletsExtensions.fs" />
+    <Compile Include="Extensions.fs" />
     <Compile Include="Actions.fs" />
     <Content Include="Global.asax" />
     <Compile Include="Global.asax.fs" />
