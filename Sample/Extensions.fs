@@ -52,6 +52,14 @@ module FormletsExtensions =
         let env = EnvDict.fromFormAndFiles ctx.HttpContext.Request
         run formlet env
 
+    let runGet formlet (ctx: ControllerContext) =
+        let env = EnvDict.fromNV ctx.HttpContext.Request.QueryString
+        run formlet env
+
+    let runParams formlet (ctx: ControllerContext) =
+        let env = EnvDict.fromNV ctx.HttpContext.Request.Params
+        run formlet env
+
     type 'a FormActionParameters = {
         Formlet: ControllerContext -> 'a Formlet
         Page: ControllerContext -> XNode list -> Node list
