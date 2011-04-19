@@ -126,7 +126,8 @@ type MvcApplication() =
             get url (fun ctx -> Result.wbview [&ctx.Session.Get(k)])
         //arcChallenge2()
 
-        let arcChallenge3() =
+        let continuation1() =
+            // bad idea, doesn't really work
             let url = "said"
             let hiddenContField = "_k"
             let hiddenCont v = tag "input" ["name", hiddenContField; "type","hidden"; "value",losSerializer.Serialize v] nop
@@ -152,7 +153,27 @@ type MvcApplication() =
             get url (fun ctx -> Result.formlet (formletCont (0,post1)))
             post url contAction
 
-        arcChallenge3()
+        //arcChallenge3()
+
+        let continuation2() =
+            let formlet url a = form "post" url [] (yields t2 <*> pickler a <*> input "" [] <* submit "Send" [])
+            post "post2"
+                (fun ctx ->
+                    let vformlet = formlet "" ""
+                    match runForm vformlet ctx with
+                    | Success (firstName,lastName) -> Result.contentf "Hello %s %s" firstName lastName
+                    | _ -> failwith "bla")
+            post "post1"
+                (fun ctx ->
+                    let vformlet = formlet "" ()
+                    match runForm vformlet ctx with
+                    | Success (_,firstName) -> Result.formlet (formlet "post2" firstName)
+                    | _ -> failwith "bla")
+            get "name" (fun _ -> Result.formlet (formlet "post1" ()))
+        //continuation2()
+
+        let continuation3() =
+            ()
 
         // async
         let google (ctx: ControllerContext) = async {
