@@ -177,9 +177,9 @@ type MvcApplication() =
             let ffirstname = text "First name:" *> inputsend
             let flastname = text "Last name:" *> inputsend
 
-            get "name" (formletAction "name1" nop (fun _ _ _ -> (),ffirstname))
-            post "name1" (formletAction "name2" ffirstname (fun _ _ firstname -> firstname,flastname))
-            post "name2" (formletAction "" flastname (fun _ firstname lastname -> (),textf "Hello %s %s" firstname lastname))
+            getFormlet "name" "name1" nop (fun _ _ _ -> (),ffirstname)
+            postFormlet "name1" "name2" ffirstname (fun _ _ firstname -> firstname,flastname)
+            postFormlet "name2" "" flastname (fun _ firstname lastname -> (),textf "Hello %s %s" firstname lastname)
 
         continuation3()
 

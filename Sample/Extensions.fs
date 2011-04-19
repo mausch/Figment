@@ -112,3 +112,8 @@ module FormletsExtensions =
                 Result.formlet formlet
             | _ -> failwith "bla"
 
+    let getFormlet url nextUrl thisFormlet (a: FormletAction<_,_,_,_>) =
+        get url (formletAction nextUrl thisFormlet a)
+
+    let postFormlet url nextUrl thisFormlet (a: FormletAction<_,_,_,_>) =
+        post url (formletAction nextUrl thisFormlet a)
