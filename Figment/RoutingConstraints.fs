@@ -1,6 +1,5 @@
 ﻿module Figment.RoutingConstraints
 
-open System.Linq
 open System.Text.RegularExpressions
 open System.Web
 open System.Web.Routing
@@ -9,10 +8,10 @@ type RouteConstraint = HttpContextBase * RouteData -> bool
 
 (* operators *)
 let allOf (constraints: RouteConstraint list) (ctx: HttpContextBase, route: RouteData) = 
-    Enumerable.All(constraints, (fun c -> c(ctx,route)))
+    Seq.forall (fun c -> c(ctx,route)) constraints
 
 let anyOf (constraints: RouteConstraint list) (ctx: HttpContextBase, route: RouteData) = 
-    Enumerable.Any(constraints, (fun c -> c(ctx,route)))
+    Seq.exists (fun c -> c(ctx,route)) constraints
 
 let (||.) (x: RouteConstraint) (y: RouteConstraint) = anyOf [x;y]
 
