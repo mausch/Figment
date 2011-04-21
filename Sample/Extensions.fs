@@ -113,5 +113,10 @@ module FormletsExtensions =
                 Result.formlet formlet
             | _ -> failwith "bla"
 
-    let actionFormlet url nextUrl thisFormlet a =
-        action (ifPathIs url) (formletToAction nextUrl thisFormlet a)
+    let actionFormlet thisFormlet a url i =
+        let s i = if i = 0 then "" else i.ToString()
+        let thisUrl = url + s i
+        let i = i+1
+        let nextUrl = url + s i
+        action (ifPathIs thisUrl) (formletToAction nextUrl thisFormlet a)
+        url,i
