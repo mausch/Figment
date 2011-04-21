@@ -24,6 +24,10 @@ let (!.) (x: RouteConstraint) (ctx: HttpContextBase, route: RouteData) =
 (* constraints *)
 let any (ctx: HttpContextBase, route: RouteData) = true
 
+let ifPathIs (url: string) =
+    fun (ctx: HttpContextBase, route: RouteData) ->
+        ctx.Request.Url.AbsolutePath = "/"+url
+
 let ifUrlMatches (rx: string) =
     if rx = null
         then invalidArg "rx" "regex null"

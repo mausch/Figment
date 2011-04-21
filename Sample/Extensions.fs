@@ -48,6 +48,7 @@ module FormletsExtensions =
     open Figment.Routing
     open Figment.Extensions
     open Formlets
+    open Figment.RoutingConstraints
 
     let runPost formlet (ctx: ControllerContext) =
         let env = EnvDict.fromFormAndFiles ctx.Request
@@ -112,11 +113,5 @@ module FormletsExtensions =
                 Result.formlet formlet
             | _ -> failwith "bla"
 
-    let getFormlet url nextUrl thisFormlet a =
-        get url (formletToAction nextUrl thisFormlet a)
-
-    let postFormlet url nextUrl thisFormlet a =
-        post url (formletToAction nextUrl thisFormlet a)
-
-    let actionFormlet hmethod url nextUrl thisFormlet a =
-        register hmethod url (formletToAction nextUrl thisFormlet a)
+    let actionFormlet url nextUrl thisFormlet a =
+        action (ifPathIs url) (formletToAction nextUrl thisFormlet a)
