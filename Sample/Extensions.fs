@@ -113,7 +113,7 @@ module FormletsExtensions =
                 Result.formlet formlet
             | _ -> failwith "bla"
 
-    let actionFormlet thisFormlet a url i =
+    let actionFormlet thisFormlet a (url, i) =
         let s i = if i = 0 then "" else i.ToString()
         let thisUrl = url + s i
         let i = i+1

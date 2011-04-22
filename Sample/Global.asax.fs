@@ -177,9 +177,11 @@ type MvcApplication() =
             let ffirstname = text "First name:" *> inputsend
             let flastname = text "Last name:" *> inputsend
 
-            let name,i = actionFormlet nop (fun _ _ _ -> (),ffirstname) "name" 0
-            let name,i = actionFormlet ffirstname (fun _ _ firstname -> firstname,flastname) name i
-            let _,_    = actionFormlet flastname (fun _ firstname lastname -> (),textf "Hello %s %s" firstname lastname) name i
+            ("name", 0)
+            |> actionFormlet nop (fun _ _ _ -> (),ffirstname)
+            |> actionFormlet ffirstname (fun _ _ firstname -> firstname,flastname)
+            |> actionFormlet flastname (fun _ firstname lastname -> (),textf "Hello %s %s" firstname lastname)
+            |> ignore
             ()
 
         continuation3()
