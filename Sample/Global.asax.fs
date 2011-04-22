@@ -55,7 +55,7 @@ type MvcApplication() =
         // binding to request
         let greet' (ctx: ControllerContext) = 
             let boundGreet = greet >> sprintf "<h1>%s</h1>" >> Result.content
-            boundGreet ctx.HttpContext.Request.["somefield"]
+            boundGreet ctx.["somefield"]
         post "action6" greet'
 
         // handle get to "action6"
@@ -64,8 +64,7 @@ type MvcApplication() =
             sprintf "Hello %s %s, you're %d years old" firstName lastName age
         // binding to request
         let greet' (ctx: ControllerContext) =
-            let req = ctx.HttpContext.Request
-            greet req.["firstname"] req.["lastname"] (int req.["age"])
+            greet ctx.["firstname"] ctx.["lastname"] (int ctx.["age"])
             |> sprintf "<p>%s</p>" |> Result.content
         get "action6" greet'
 

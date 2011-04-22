@@ -151,3 +151,5 @@ module Extensions =
         member x.GetValue n = 
             let r = x.Controller.ValueProvider.GetValue n
             unbox r.RawValue
+        member x.Item 
+            with get k = x.Request.[k]
