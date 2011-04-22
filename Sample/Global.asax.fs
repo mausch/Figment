@@ -81,7 +81,6 @@ type MvcApplication() =
         // wing beats integration
         let e = XhtmlElement()
         let s = e.Shortcut
-        let f = e.Formlets
         let wbpage title = 
             [e.Html [
                 e.Head [
@@ -134,6 +133,8 @@ type MvcApplication() =
                     ]
                 ]
             ]
+
+        let f = e.Formlets
 
         let registrationFormlet =
 
