@@ -104,89 +104,6 @@ type MvcApplication() =
 
         action ifGetDsl (wbpageview "You're using Internet Explorer")
 
-        // http://www.paulgraham.com/arcchallenge.html
-        let arcChallenge() =            
-            let k,url,url2 = "s","said","showsaid"
-            get url (wbview [s.FormPost url [e.Input ["name",k]; s.Submit "Send"]])
-            post url (fun ctx -> (k, ctx.Form.[k]) ||> ctx.Session.Set; Result.wbview [s.Link url2 "click here"])
-            get url2 (fun ctx -> Result.wbview [&ctx.Session.Get(k)])
-        //arcChallenge()
-
-        // http://www.paulgraham.com/arcchallenge.html
-        let arcChallenge2() =
-            let getpost url formlet action =
-                let page _ form = [s.FormPost url [yield!!+ form; yield s.Submit "Send"]]
-                formAction url {
-                    Formlet = fun _ -> formlet
-                    Page = page
-                    Success = action
-                }
-            let k,url = "s","showsaid"
-            getpost "said" (f.Text()) (fun ctx v -> ctx.Session.Set k v; Result.wbview [s.Link url "click here"])
-            get url (fun ctx -> Result.wbview [&ctx.Session.Get(k)])
-        //arcChallenge2()
-
-        let continuation1() =
-            // bad idea, doesn't really work
-            let url = "said"
-            let hiddenContField = "_k"
-            let hiddenCont v = tag "input" ["name", hiddenContField; "type","hidden"; "value",losSerializer.Serialize v] nop
-            let formlet a = form "post" url [] (input "" [] <* hiddenCont a <* submit "Send" [])
-            let vformlet = formlet ()
-            let formletCont (v: obj, cont: obj -> ControllerContext -> ActionResult) = formlet (v,cont)
-            let contAction (ctx: ControllerContext) : ActionResult =
-                let (v,cont) = losSerializer.Deserialize ctx.Request.[hiddenContField] |> unbox
-                cont v ctx
-
-            let post2 (firstName: obj) (ctx: ControllerContext) =
-                match runPost vformlet ctx with
-                | Success lastName ->
-                    Result.contentf "Hello %s %s" (string firstName) lastName
-                | _ -> failwith "ohnoes"
-
-            let post1 _ (ctx: ControllerContext) =
-                match runPost vformlet ctx with
-                | Success firstName ->
-                    Result.formlet (formletCont (firstName,post2))
-                | _ -> failwith "ohnoes"
-                
-            get url (fun ctx -> Result.formlet (formletCont (0,post1)))
-            post url contAction
-
-        //arcChallenge3()
-
-        let continuation2() =
-            let formlet url a = form "post" url [] (yields t2 <*> pickler a <*> input "" [] <* submit "Send" [])
-            post "post2"
-                (fun ctx ->
-                    let vformlet = formlet "" ""
-                    match runPost vformlet ctx with
-                    | Success (firstName,lastName) -> Result.contentf "Hello %s %s" firstName lastName
-                    | _ -> failwith "bla")
-            post "post1"
-                (fun ctx ->
-                    let vformlet = formlet "" ()
-                    match runPost vformlet ctx with
-                    | Success (_,firstName) -> Result.formlet (formlet "post2" firstName)
-                    | _ -> failwith "bla")
-            get "name" (fun _ -> Result.formlet (formlet "post1" ()))
-        //continuation2()
-
-        let continuation3() =
-            let inputsend = input "" [] <* submit "Send" []
-            let ffirstname = text "First name:" *> inputsend
-            let flastname = text "Last name:" *> inputsend
-
-            ("name", 0)
-            |> actionFormlet nop (fun _ _ _ -> (),ffirstname)
-            |> actionFormlet ffirstname (fun _ _ firstname -> firstname,flastname)
-            |> actionFormlet flastname (fun _ firstname lastname -> (),textf "Hello %s %s" firstname lastname)
-            |> ignore
-            ()
-
-        continuation3()
-
-
         // async
         let google (ctx: ControllerContext) = async {
             Debug.WriteLine "Start async action"
@@ -301,6 +218,42 @@ type MvcApplication() =
             Page = fun _ -> registrationPage
             Success = fun _ v -> Result.redirectf "thankyou?n=%s" v.Name
         }
+
+        // http://www.paulgraham.com/arcchallenge.html
+        let arcChallenge() =            
+            let k,url,url2 = "s","said","showsaid"
+            get url (wbview [s.FormPost url [e.Input ["name",k]; s.Submit "Send"]])
+            post url (fun ctx -> (k, ctx.Form.[k]) ||> ctx.Session.Set; Result.wbview [s.Link url2 "click here"])
+            get url2 (fun ctx -> Result.wbview [&ctx.Session.Get(k)])
+        //arcChallenge()
+
+        // http://www.paulgraham.com/arcchallenge.html
+        let arcChallenge2() =
+            let getpost url formlet action =
+                let page _ form = [s.FormPost url [yield!!+ form; yield s.Submit "Send"]]
+                formAction url {
+                    Formlet = fun _ -> formlet
+                    Page = page
+                    Success = action
+                }
+            let k,url = "s","showsaid"
+            getpost "said" (f.Text()) (fun ctx v -> ctx.Session.Set k v; Result.wbview [s.Link url "click here"])
+            get url (fun ctx -> Result.wbview [&ctx.Session.Get(k)])
+        //arcChallenge2()
+
+        let formletSequence() =
+            let inputsend = input "" [] <* submit "Send" []
+            let ffirstname = text "First name:" *> inputsend
+            let flastname = text "Last name:" *> inputsend
+
+            ("name", 0)
+            |> actionFormlet nop (fun _ _ _ -> (),ffirstname)
+            |> actionFormlet ffirstname (fun _ _ firstname -> firstname,flastname)
+            |> actionFormlet flastname (fun _ firstname lastname -> (),textf "Hello %s %s" firstname lastname)
+            |> ignore
+            ()
+
+        formletSequence()
 
         action any (status 404 => content "<h1>Not found!</h1>")
         
