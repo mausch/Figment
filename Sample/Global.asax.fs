@@ -253,7 +253,25 @@ type MvcApplication() =
             |> ignore
             ()
 
-        formletSequence()
+        //formletSequence()
+
+        let formletBind() =
+            let inputsend = input "" [] <* submit "Send" []
+            let ffirstname = text "First name:" *> inputsend
+            let flastname = text "Last name:" *> inputsend
+
+            let cc = 
+                let web = WebBuilder()                
+                web {
+                    let! firstname = showFormlet ffirstname
+                    let! lastname = showFormlet flastname
+                    let show = textf "Hello %s %s" firstname lastname
+                    return! showFormlet show
+                }
+            action (ifPathIs "name") (toAction cc)
+            ()
+
+        formletBind()
 
         action any (status 404 => content "<h1>Not found!</h1>")
         

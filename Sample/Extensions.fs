@@ -42,6 +42,7 @@ module XhtmlElementExtensions =
 
 [<AutoOpen>]
 module FormletsExtensions =
+    open System
     open System.Xml.Linq
     open System.Web.Mvc
     open WingBeats.Xml
@@ -94,12 +95,19 @@ module FormletsExtensions =
     /// </summary>
     type FormletAction<'a,'b,'c,'d> = ControllerContext -> 'a -> 'b -> ('c * 'd Formlet)
 
-    let internal stateField = "_state"
-    let internal getState (ctx: ControllerContext) =
-        ctx.Request.Params.[stateField] |> losSerializer.Deserialize |> unbox
-    let internal setState v (f: _ Formlet) =
-        let v = losSerializer.Serialize v
-        assignedHidden stateField v *> f
+    let internal stateMgr =
+        let stateField = "_state"
+        let serializer = binSerializer
+        let getState (ctx: ControllerContext) =
+            ctx.Request.Params.[stateField] |> serializer.Deserialize |> unbox
+        let setState v (f: _ Formlet) =
+            let v = serializer.Serialize v
+            assignedHidden stateField v *> f
+        getState,setState
+    let internal getState x = fst stateMgr x
+    let internal setState x = snd stateMgr x
+    let internal copyState (ctx: ControllerContext) =
+        getState ctx |> setState
     let internal aform nexturl formlet = form "post" nexturl [] formlet
 
     let formletToAction nextUrl (f: _ Formlet) (a: FormletAction<_,_,_,_>) : Helpers.FAction =
@@ -120,3 +128,48 @@ module FormletsExtensions =
         let nextUrl = url + s i
         action (ifPathIs thisUrl) (formletToAction nextUrl thisFormlet a)
         url,i
+
+    type Web<'a> = ControllerContext -> 'a Formlet
+
+    let internal aform2 formlet = form "post" "" [] formlet
+
+    let makeCont (f: 'a -> Web<'b>) (formlet: 'a Formlet) : Web<'b> =
+        fun ctx ->
+            match runParams formlet ctx with
+            | Success v -> f v ctx
+            | _ -> failwith "booooo"
+
+    type WebBuilder() =
+        member x.Bind(a: Web<'a>, f: 'a -> Web<'b>): Web<'a> = 
+            fun (ctx: ControllerContext) ->
+                let formlet = a ctx
+                let cont = box (makeCont f formlet), box typeof<'b>
+                formlet |> setState cont |> aform2
+
+        member x.Return a : Web<_> = 
+            fun ctx ->
+                failwith "return"
+
+        member x.ReturnFrom a = a
+
+    let showFormlet (formlet: 'a Formlet) : Web<_> =
+        fun ctx -> formlet
+
+    open System.Reflection
+
+    let toAction (w: Web<_>) : Helpers.FAction =
+        fun ctx ->            
+            let cont = getState ctx
+            match cont with
+            | null -> 
+                w ctx |> Result.formlet
+            | _ -> 
+                let t: Type = cont.GetType().GetProperty("Item2").GetValue(cont, null) |> unbox
+                let c = cont.GetType().GetProperty("Item1").GetValue(cont, null)
+                let formlet = c.GetType().GetMethod("Invoke").Invoke(c, [|ctx|])
+                let figmentResultType = Type.GetType("Figment.Result, Sample")
+                let rftm = figmentResultType.GetMethod("formlet", BindingFlags.Static ||| BindingFlags.Public)
+                let rftmg = rftm.GetGenericMethodDefinition()
+                let rf = rftmg.MakeGenericMethod([|t|])                
+                let r = rf.Invoke(null, [|formlet|])
+                unbox r
