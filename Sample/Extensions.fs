@@ -131,15 +131,18 @@ module FormletsExtensions =
 
     type Web<'a> = ControllerContext -> 'a Formlet
 
-    let internal aform2 formlet = form "post" "" [] formlet
 
-    let makeCont (f: 'a -> Web<'b>) (formlet: 'a Formlet) : Web<'b> =
-        fun ctx ->
-            match runParams formlet ctx with
-            | Success v -> f v ctx
-            | _ -> failwith "booooo"
+    open System.Reflection
 
     type WebBuilder() =
+        let makeCont (f: 'a -> Web<'b>) (formlet: 'a Formlet) : Web<'b> =
+            fun ctx ->
+                match runParams formlet ctx with
+                | Success v -> f v ctx
+                | _ -> failwith "booooo"
+
+        let aform2 formlet = form "post" "" [] formlet
+        
         member x.Bind(a: Web<'a>, f: 'a -> Web<'b>): Web<'a> = 
             fun (ctx: ControllerContext) ->
                 let formlet = a ctx
@@ -152,24 +155,22 @@ module FormletsExtensions =
 
         member x.ReturnFrom a = a
 
-    let showFormlet (formlet: 'a Formlet) : Web<_> =
-        fun ctx -> formlet
+        member x.ShowFormlet (formlet: 'a Formlet) : Web<_> =
+            fun ctx -> formlet
 
-    open System.Reflection
-
-    let toAction (w: Web<_>) : Helpers.FAction =
-        fun ctx ->            
-            let cont = getState ctx
-            match cont with
-            | null -> 
-                w ctx |> Result.formlet
-            | _ -> 
-                let t: Type = cont.GetType().GetProperty("Item2").GetValue(cont, null) |> unbox
-                let c = cont.GetType().GetProperty("Item1").GetValue(cont, null)
-                let formlet = c.GetType().GetMethod("Invoke").Invoke(c, [|ctx|])
-                let figmentResultType = Type.GetType("Figment.Result, Sample")
-                let rftm = figmentResultType.GetMethod("formlet", BindingFlags.Static ||| BindingFlags.Public)
-                let rftmg = rftm.GetGenericMethodDefinition()
-                let rf = rftmg.MakeGenericMethod([|t|])                
-                let r = rf.Invoke(null, [|formlet|])
-                unbox r
+        member x.ToAction (w: Web<_>) : Helpers.FAction =
+            fun ctx ->            
+                let cont = getState ctx
+                match cont with
+                | null -> 
+                    w ctx |> Result.formlet
+                | _ -> 
+                    let t: Type = cont.GetType().GetProperty("Item2").GetValue(cont, null) |> unbox
+                    let c = cont.GetType().GetProperty("Item1").GetValue(cont, null)
+                    let formlet = c.GetType().GetMethod("Invoke").Invoke(c, [|ctx|])
+                    let figmentResultType = Type.GetType("Figment.Result, Sample")
+                    let rftm = figmentResultType.GetMethod("formlet", BindingFlags.Static ||| BindingFlags.Public)
+                    let rftmg = rftm.GetGenericMethodDefinition()
+                    let rf = rftmg.MakeGenericMethod([|t|])                
+                    let r = rf.Invoke(null, [|formlet|])
+                    unbox r

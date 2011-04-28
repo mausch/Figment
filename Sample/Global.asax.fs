@@ -256,19 +256,19 @@ type MvcApplication() =
         //formletSequence()
 
         let formletBind() =
+            let web = WebBuilder()
             let inputsend = input "" [] <* submit "Send" []
             let ffirstname = text "First name:" *> inputsend
             let flastname = text "Last name:" *> inputsend
 
             let cc = 
-                let web = WebBuilder()                
                 web {
-                    let! firstname = showFormlet ffirstname
-                    let! lastname = showFormlet flastname
+                    let! firstname = web.ShowFormlet ffirstname
+                    let! lastname = web.ShowFormlet flastname
                     let show = textf "Hello %s %s" firstname lastname
-                    return! showFormlet show
+                    return! web.ShowFormlet show
                 }
-            action (ifPathIs "name") (toAction cc)
+            action (ifPathIs "name") (web.ToAction cc)
             ()
 
         formletBind()
