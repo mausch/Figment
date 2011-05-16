@@ -51,14 +51,6 @@ let redirectf f = Printf.kprintf redirect f
 let redirectToRoute (routeValues: RouteValueDictionary) =
     RedirectToRouteResult(routeValues) :> ActionResult
 
-/// doesn't work, can't compare IRouteHandlers
-let redirectToAction action =    
-    let routes = Enumerable.OfType<Route> RouteTable.Routes
-    //let routes = RouteTable.Routes |> Enumerable.OfType
-    let handler = FigmentRouteHandler(action) :> IRouteHandler
-    let route = routes |> Seq.find (fun r -> r.RouteHandler = handler)
-    redirect route.Url
-
 let unauthorized = HttpUnauthorizedResult() :> ActionResult
 
 let status code =

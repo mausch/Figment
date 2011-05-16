@@ -23,11 +23,9 @@ type ActionRegistration = {
     static member make(routeName, action, route) = 
         {routeName = routeName; action = action; route = route}
 
-let mutable registeredActions = List.empty<ActionRegistration>
-
 type RouteCollection with
     member private this.MapAction(routeConstraint: RouteConstraint, handler: IRouteHandler) = 
-        let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
+        let defaults = RouteValueDictionary(dict ["controller", "Views" :> obj])
         let route = {new RouteBase() with
                         override this.GetRouteData ctx = 
                             let data = RouteData(routeHandler = handler, route = this)
@@ -43,13 +41,11 @@ type RouteCollection with
     member this.MapAction(routeConstraint: RouteConstraint, action: FAction) = 
         let handler = FigmentRouteHandler(action)
         let route = this.MapAction(routeConstraint, handler)
-        let routeName = Guid.NewGuid().ToString()
-        registeredActions <- ActionRegistration.make(routeName, action, route)::registeredActions
+        ()
 
     member this.MapAction(routeConstraint: RouteConstraint, action: FAsyncAction) = 
         let handler = FigmentAsyncRouteHandler(action)
         let route = this.MapAction(routeConstraint, handler)
-        // TODO: add to registeredActions
         ()
 
     member private this.MapWithMethod(url, routeName, httpMethod, handler) = 
@@ -63,7 +59,7 @@ type RouteCollection with
     member this.MapWithMethod(url, routeName, httpMethod, action: FAction) =
         let handler = FigmentRouteHandler(action)
         let route = this.MapWithMethod(url, routeName, httpMethod, handler)
-        registeredActions <- ActionRegistration.make(routeName, action, route)::registeredActions
+        ()
 
     member this.MapWithMethod(url, routeName, httpMethod, action: FAsyncAction) =
         let handler = FigmentAsyncRouteHandler(action)
@@ -105,17 +101,6 @@ let stripFormatting s =
     let parameters = List.rev !parameters
     (replace, parameters)
 
-let functionInvoke f v (domain: Type) (range: Type) = 
-    let fsFunc = typedefof<FSharpFunc<_,_>>.MakeGenericType [| domain; range |]
-    let invokeMethod: MethodInfo = fsFunc.GetMethod("Invoke", [| domain |])
-    invokeMethod.Invoke(f, [| v |])
-
-let (-!>) (domain: Type) (range: Type) = 
-    FSharpType.MakeFunctionType(domain, range)
-
-let (-->) (functionType: Type) (impl: obj -> obj) =
-    FSharpValue.MakeFunction(functionType, impl)
-
 let rec bindAll (fTypes: Type list) (parameters: string list) (ctx: ControllerContext) =
     match fTypes with
     | [] -> failwith "no function types!"
@@ -144,32 +129,5 @@ let register (httpMethod: HttpMethod) url action =
     | POST -> post url action
     | _ -> failwith "Not supported"
 
-let remove routeName =
-    let reg = registeredActions |> Seq.find (fun r -> r.routeName = routeName)
-    RouteTable.Routes.Remove reg.route
-
 let clear () =
     RouteTable.Routes.Clear()
-
-/// doesn't work yet
-let inThisAssembly(): FAction seq =
-    let entities = 
-        let topLevelEntities = 
-            (FSharpAssembly.FromAssembly (Assembly.GetCallingAssembly())).Entities
-            |> Seq.toList
-        let rec getEntities (entities: FSharpEntity list) = 
-            let nestedEntities = entities |> Seq.collect (fun e -> e.NestedEntities) |> Seq.toList
-            match nestedEntities with
-            | [] -> entities
-            | _ -> entities @ getEntities nestedEntities
-        getEntities topLevelEntities
-    let values = entities |> Seq.collect (fun e -> e.MembersOrValues)
-    let functions = values |> Seq.filter (fun v -> v.Type.IsFunction)
-    let names = functions |> Seq.map (fun f -> f.CompiledName) |> Seq.toList
-    [Actions.empty] :> seq<FAction>
-
-/// not implemented
-let registerAllWithAttribute (attr: #Attribute) (actions: unit -> FAction seq) = 
-    let t = actions()
-    raise <| NotImplementedException()
-    ()
