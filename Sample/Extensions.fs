@@ -5,9 +5,7 @@ open System.Web.Mvc
 
 module Result =
     let wbview (n: Node list) =
-        {new ActionResult() with
-            override x.ExecuteResult ctx =
-                Renderer.Render(n, ctx.HttpContext.Response.Output) }
+        Result.result (fun ctx -> Renderer.Render(n, ctx.HttpContext.Response.Output))
 
     open Formlets
 

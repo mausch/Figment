@@ -6,11 +6,18 @@ open System.Web.Mvc
 open System.Web.Routing
 open Figment.Helpers
 
-let concat (a: ActionResult) (b: ActionResult) =
+let inline result r = 
     {new ActionResult() with
-        override x.ExecuteResult ctx =
-            a.ExecuteResult ctx
-            b.ExecuteResult ctx }    
+        override x.ExecuteResult ctx = r ctx }
+
+let inline exec (r: ActionResult) ctx =
+    r.ExecuteResult ctx
+
+let concat a b =
+    let c ctx = 
+        exec a ctx
+        exec b ctx
+    result c
 
 let (>>.) = concat
 
@@ -55,9 +62,7 @@ let redirectToAction action =
 let unauthorized = HttpUnauthorizedResult() :> ActionResult
 
 let status code =
-    {new ActionResult() with
-        override x.ExecuteResult ctx =
-            ctx.HttpContext.Response.StatusCode <- code }
+    result (fun ctx -> ctx.HttpContext.Response.StatusCode <- code)
 
 let file contentType stream =
     FileStreamResult(stream, contentType) :> ActionResult
