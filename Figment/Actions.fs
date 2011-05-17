@@ -31,3 +31,6 @@ let notFound (ctx: ControllerContext) = Result.notFound()
     
 let status code (ctx: ControllerContext) =
     Result.status code
+
+let contentType t (ctx: ControllerContext) =
+    Result.contentType t

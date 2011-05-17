@@ -56,6 +56,9 @@ let unauthorized = HttpUnauthorizedResult() :> ActionResult
 let status code =
     result (fun ctx -> ctx.HttpContext.Response.StatusCode <- code)
 
+let contentType t =
+    result (fun ctx -> ctx.HttpContext.Response.ContentType <- t)
+
 let file contentType stream =
     FileStreamResult(stream, contentType) :> ActionResult
 
