@@ -84,6 +84,30 @@ module Extensions =
                         false
                 }
 
+        member this.AsReadonlyDictionary() =
+            let a = this.AsDictionary()
+            let notSupported() = raise <| NotSupportedException("Readonly dictionary")
+            { new IDictionary<string,string[]> with
+                member d.Count = a.Count
+                member d.IsReadOnly = true
+                member d.Item 
+                    with get k = a.[k]
+                    and set k v = notSupported()
+                member d.Keys = a.Keys
+                member d.Values = a.Values
+                member d.Add v = notSupported()
+                member d.Add(key,value) = notSupported()
+                member d.Clear() = notSupported()
+                member d.Contains item = a.Contains item
+                member d.ContainsKey key = a.ContainsKey key
+                member d.CopyTo(array,arrayIndex) = a.CopyTo(array,arrayIndex)
+                member d.GetEnumerator() = a.GetEnumerator()
+                member d.GetEnumerator() = a.GetEnumerator() :> IEnumerator
+                member d.Remove (item: KeyValuePair<string,string[]>) = notSupported(); false
+                member d.Remove (key: string) = notSupported(); false
+                member d.TryGetValue(key: string, value: byref<string[]>) = a.TryGetValue(key, ref value)
+            }                
+
         member this.AsLookup() =
             let getEnumerator() = 
                 let e = this.GetEnumerator()

@@ -69,3 +69,9 @@ let ``NameValueCollection as IDictionary``() =
     | false, _ -> failwith "key should have been found"
     | _, [|"one";"uno"|] -> ()
     | _ -> failwith "values not matched"
+    l.["2"] <- [|"dos";"two"|]
+    match l.TryGetValue "2" with
+    | false, _ -> failwith "key should have been found"
+    | _, [|"dos";"two"|] -> ()
+    | _ -> failwith "values not matched"
+
