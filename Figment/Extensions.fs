@@ -9,6 +9,7 @@ open System.Web.Mvc
 open Microsoft.FSharp.Reflection
 open System.Text.RegularExpressions
 open System.Web.Caching
+open System.Linq
 
 module Extensions = 
     let internal bindingFlags = BindingFlags.NonPublic ||| BindingFlags.Instance
@@ -17,6 +18,36 @@ module Extensions =
     let internal simpleBitVectorClear = httpRequestFlags.FieldType.GetMethod("Clear", bindingFlags)
     let internal simpleBitVectorIntValueSet = httpRequestFlags.FieldType.GetProperty("IntegerValue", bindingFlags)
     let internal formValidation = 2
+
+    type System.Collections.Specialized.NameValueCollection with
+        member this.AsLookup() =
+            let getEnumerator() = 
+                let e = this.GetEnumerator()
+                let wrapElem (o: obj) = 
+                    let key = o :?> string
+                    let values = this.GetValues key :> seq<string>
+                    { new IGrouping<string,string> with
+                        member x.Key = key
+                        member x.GetEnumerator() = values.GetEnumerator()
+                        member x.GetEnumerator() = values.GetEnumerator() :> IEnumerator }
+
+                { new IEnumerator<IGrouping<string,string>> with
+                    member x.Current = wrapElem e.Current
+                    member x.MoveNext() = e.MoveNext()
+                    member x.Reset() = e.Reset()
+                    member x.Dispose() = ()
+                    member x.Current = box (wrapElem e.Current) }
+                    
+            { new ILookup<string,string> with
+                member x.Count = this.Count
+                member x.Item 
+                    with get key = 
+                        match this.GetValues key with
+                        | null -> Seq.empty
+                        | a -> upcast a
+                member x.Contains key = this.Get key <> null
+                member x.GetEnumerator() = getEnumerator()
+                member x.GetEnumerator() = getEnumerator() :> IEnumerator }
 
     type CaptureCollection with
         member this.Captures 

@@ -37,4 +37,18 @@ let GetFlattenedFunctionElements_int_float_string() =
     Assert.Equal(typeof<int>, t.[0])
     Assert.Equal(typeof<float>, t.[1])
     Assert.Equal(typeof<string>, t.[2])
+
+open System.Collections.Specialized
+open System.Linq
     
+[<Fact>]
+let ``NameValueCollection as ILookup``() =
+    let nv = NameValueCollection()
+    nv.Add("1", "one")
+    nv.Add("1", "uno")
+    let l = nv.AsLookup()
+    Assert.True(l.Contains "1")
+    Assert.False(l.Contains "2")
+    Assert.True(Seq.isEmpty l.["2"])
+    Assert.Equal(2, Enumerable.Count l.["1"])
+    ()
