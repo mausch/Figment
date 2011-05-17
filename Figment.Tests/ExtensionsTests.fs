@@ -33,7 +33,7 @@ let GetFlattenedFunctionElements_unit_int() =
 let GetFlattenedFunctionElements_int_float_string() =
     let f (i: int) (j: float) = "bla"
     let t = FSharpType.GetFlattenedFunctionElements(f.GetType())
-    Assert.Equal(2, t.Length)
+    Assert.Equal(3, t.Length)
     Assert.Equal(typeof<int>, t.[0])
     Assert.Equal(typeof<float>, t.[1])
     Assert.Equal(typeof<string>, t.[2])
