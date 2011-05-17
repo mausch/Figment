@@ -196,7 +196,7 @@ module Extensions =
     type HttpSessionStateBase with
         member x.Get (n: string) = unbox x.[n]
         member x.Set (n: string) v = x.[n] <- v
-        member x.asDict =
+        member x.AsDictionary() =
             let notimpl() = raise <| NotImplementedException()
             let getEnumerator() =
                 let sessionEnum = x.GetEnumerator()
@@ -261,7 +261,7 @@ module Extensions =
         member x.UrlHelper = UrlHelper(x.RequestContext)
         member x.Cache = x.HttpContext.Cache
         member x.Session = x.HttpContext.Session
-        member x.SessionDict = x.Session.asDict
+        member x.SessionDict = x.Session.AsDictionary()
         member x.Request = x.HttpContext.Request
         member x.Url = x.Request.Url
         member x.QueryString = x.Request.QueryString
