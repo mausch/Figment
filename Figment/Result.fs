@@ -59,8 +59,21 @@ let status code =
 let contentType t =
     result (fun ctx -> ctx.HttpContext.Response.ContentType <- t)
 
+let charset c =
+    result (fun ctx -> ctx.HttpContext.Response.Charset <- c)
+
 let file contentType stream =
     FileStreamResult(stream, contentType) :> ActionResult
 
 let json data =
     JsonResult(Data = data) :> ActionResult
+
+let xml data = 
+    // charset?
+    contentType "text/xml" >>.
+    if data = null
+        then content ""
+        else
+            result (fun ctx ->
+                        let serializer = System.Xml.Serialization.XmlSerializer(data.GetType())
+                        serializer.Serialize(ctx.HttpContext.Response.Output, data))
