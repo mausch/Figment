@@ -50,3 +50,10 @@ let ifUserAgentMatches (rx: string) =
     let rxx = Regex(rx)
     fun (ctx: HttpContextBase, route: RouteData) ->
         rxx.IsMatch ctx.Request.UserAgent
+
+open System
+open Helpers
+
+let ifIsAjax (ctx: HttpContextBase, route: RouteData) =
+    let requestedWith = ctx.Request.Headers.["X-Requested-With"]
+    requestedWith <> null && requestedWith =. "xmlhttprequest"
