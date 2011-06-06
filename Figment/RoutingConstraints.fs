@@ -41,8 +41,10 @@ let ifMethodIs httpMethod =
         ctx.Request.HttpMethod = httpMethod
 
 let ifMethodIsGet x = ifMethodIs "GET" x
-
 let ifMethodIsPost x = ifMethodIs "POST" x
+let ifMethodIsHead x = ifMethodIs "HEAD" x
+let ifMethodIsPut x = ifMethodIs "PUT" x
+let ifMethodIsOptions x = ifMethodIs "OPTIONS" x
 
 let ifUserAgentMatches (rx: string) =
     if rx = null
