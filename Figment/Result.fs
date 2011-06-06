@@ -71,9 +71,6 @@ let json data =
 let xml data = 
     // charset?
     contentType "text/xml" >>.
-    if data = null
-        then content ""
-        else
-            result (fun ctx ->
-                        let serializer = System.Xml.Serialization.XmlSerializer(data.GetType())
-                        serializer.Serialize(ctx.HttpContext.Response.Output, data))
+    result (fun ctx ->
+                let serializer = System.Xml.Serialization.XmlSerializer(data.GetType())
+                serializer.Serialize(ctx.HttpContext.Response.Output, data))
