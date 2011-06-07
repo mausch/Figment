@@ -263,6 +263,7 @@ module Extensions =
         member x.Session = x.HttpContext.Session
         member x.SessionDict = x.Session.AsDictionary()
         member x.Request = x.HttpContext.Request
+        member x.Response = x.HttpContext.Response
         member x.Url = x.Request.Url
         member x.QueryString = x.Request.QueryString
         member x.Form = x.Request.Form

@@ -5,18 +5,19 @@ open System.Web
 open System.Web.Mvc
 open System.Web.Routing
 open Figment.Helpers
+open Figment.Extensions
 
 let inline result r = 
     {new ActionResult() with
         override x.ExecuteResult ctx = r ctx }
 
-let inline exec (r: ActionResult) ctx =
+let inline exec ctx (r: ActionResult) =
     r.ExecuteResult ctx
 
 let concat a b =
     let c ctx = 
-        exec a ctx
-        exec b ctx
+        exec ctx a
+        exec ctx b
     result c
 
 let (>>.) = concat
@@ -54,19 +55,28 @@ let redirectToRoute (routeValues: RouteValueDictionary) =
 let unauthorized = HttpUnauthorizedResult() :> ActionResult
 
 let status code =
-    result (fun ctx -> ctx.HttpContext.Response.StatusCode <- code)
+    result (fun ctx -> ctx.Response.StatusCode <- code)
 
 let contentType t =
-    result (fun ctx -> ctx.HttpContext.Response.ContentType <- t)
+    result (fun ctx -> ctx.Response.ContentType <- t)
 
 let charset c =
-    result (fun ctx -> ctx.HttpContext.Response.Charset <- c)
+    result (fun ctx -> ctx.Response.Charset <- c)
 
 let file contentType stream =
     FileStreamResult(stream, contentType) :> ActionResult
 
 let json data =
     JsonResult(Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet) :> ActionResult
+
+let jsonp callback data =
+    result (fun ctx ->
+                let cb : string = callback ctx
+                ctx.Response.Write(cb)
+                ctx.Response.Write("(")
+                json data |> exec ctx |> ignore
+                ctx.Response.Write(")"))
+    >>. contentType "application/javascript"
 
 let xml data = 
     // charset?
