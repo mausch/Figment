@@ -66,7 +66,7 @@ let file contentType stream =
     FileStreamResult(stream, contentType) :> ActionResult
 
 let json data =
-    JsonResult(Data = data) :> ActionResult
+    JsonResult(Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet) :> ActionResult
 
 let xml data = 
     // charset?
