@@ -27,6 +27,8 @@ let ifPathIs (url: string) =
     fun (ctx: HttpContextBase, route: RouteData) ->
         ctx.Request.Url.AbsolutePath = "/"+url
 
+let ifPathIsf fmt = Printf.ksprintf ifPathIs fmt
+
 let ifUrlMatches (rx: string) =
     if rx = null
         then invalidArg "rx" "regex null"
