@@ -8,6 +8,8 @@ open System.Web.Mvc
 open Figment.Result
 open Xunit
 
+let dummyController = { new ControllerBase() with member x.ExecuteCore() = () }
+
 [<Fact>]
 let ``status result``() =
     let ctx = 
@@ -19,8 +21,7 @@ let ``status result``() =
                                     with get() = !statusCode
                                     and set v = statusCode := v } }
         let req = RequestContext(ctx, RouteData())
-        let controller = { new ControllerBase() with member x.ExecuteCore() = () }
-        ControllerContext(req, controller)
+        ControllerContext(req, dummyController)
     status 200 |> exec ctx
     Assert.Equal(200, ctx.HttpContext.Response.StatusCode)
 
@@ -40,8 +41,7 @@ let ``JSONP content type is application/javascript``() =
                                 member x.Write(s: string) = 
                                     sb.Append s |> ignore } }
         let req = RequestContext(ctx, RouteData())
-        let controller = { new ControllerBase() with member x.ExecuteCore() = () }
-        ControllerContext(req, controller)
+        ControllerContext(req, dummyController)
     jsonp callback "something" |> exec ctx
     Assert.Equal("callback(\"something\")", sb.ToString())
     Assert.Equal("application/javascript", ctx.HttpContext.Response.ContentType)
