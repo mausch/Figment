@@ -30,14 +30,18 @@ let ``JSONP content type is application/javascript``() =
     let callback (ctx: ControllerContext) = "callback"
     let sb = StringBuilder()
     let ctx = 
+        let contentType = ref ""
         let ctx = { new HttpContextBase() with 
                         member x.Response = 
                             { new HttpResponseBase() with
+                                member x.ContentType
+                                    with get() = !contentType
+                                    and set v = contentType := v
                                 member x.Write(s: string) = 
                                     sb.Append s |> ignore } }
         let req = RequestContext(ctx, RouteData())
         let controller = { new ControllerBase() with member x.ExecuteCore() = () }
         ControllerContext(req, controller)
     jsonp callback "something" |> exec ctx
-    printfn "%s" (sb.ToString())
-    ()
+    Assert.Equal("callback(\"something\")", sb.ToString())
+    Assert.Equal("application/javascript", ctx.HttpContext.Response.ContentType)
