@@ -9,7 +9,10 @@ open Figment.Extensions
 
 let inline result r = 
     {new ActionResult() with
-        override x.ExecuteResult ctx = r ctx }
+        override x.ExecuteResult ctx = 
+            if ctx = null
+                then raise <| System.ArgumentNullException("ctx")
+                else r ctx }
 
 let inline exec ctx (r: ActionResult) =
     r.ExecuteResult ctx
