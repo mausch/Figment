@@ -10,7 +10,6 @@ open Binding
 open Helpers
 open Extensions
 open Microsoft.FSharp.Reflection
-open Microsoft.FSharp.Metadata
 open RoutingConstraints
 
 type HttpMethod = GET | POST | HEAD | DELETE | PUT
