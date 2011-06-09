@@ -193,6 +193,14 @@ module Extensions =
             simpleBitVectorIntValueSet.SetValue(flags, 0, null)
             httpRequestFlags.SetValue(httpRequest, flags)
 
+    type HttpResponseBase with
+        member x.Writef fmt = Printf.ksprintf x.Write fmt
+        member x.Writefn fmt = 
+            let printn (s: string) = 
+                x.Write s
+                x.Write Environment.NewLine
+            Printf.ksprintf printn fmt
+
     type HttpSessionStateBase with
         member x.Get (n: string) = unbox x.[n]
         member x.Set (n: string) v = x.[n] <- v
