@@ -66,6 +66,11 @@ let contentType t =
 let charset c =
     result (fun ctx -> ctx.Response.Charset <- c)
 
+let header name value =
+    result (fun ctx -> ctx.Response.Headers.Add(name, value))
+
+let vary field = header "Vary" field
+
 let file contentType stream =
     FileStreamResult(stream, contentType) :> ActionResult
 
