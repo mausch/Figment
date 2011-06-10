@@ -30,19 +30,6 @@ let DefaultControllerFilters = {
     resultExecutingFilter = fun c -> ()
 }
 
-
-type FigmentController(action: FAction, filters: ControllerFilters) =
-    inherit Controller() with
-        override this.OnActionExecuted ctx = filters.actionExecutedFilter ctx
-        override this.OnActionExecuting ctx = filters.actionExecutingFilter ctx
-        override this.OnAuthorization ctx = filters.authorizationFilter ctx
-        override this.OnException ctx = filters.exceptionFilter ctx
-        override this.OnResultExecuted ctx = filters.resultExecutedFilter ctx
-        override this.OnResultExecuting ctx = filters.resultExecutingFilter ctx
-        override this.ExecuteCore() = 
-            let result = action this.ControllerContext
-            result.ExecuteResult this.ControllerContext
-
 type FigmentAsyncController(action: FAsyncAction, filters: ControllerFilters) = 
     inherit ControllerBase()
         override this.ExecuteCore() = 
@@ -67,12 +54,26 @@ type FigmentAsyncController(action: FAsyncAction, filters: ControllerFilters) =
             Debug.WriteLine "Execute"
 
 type Helper() =
+    static member BuildActionInvoker (f: ControllerContext -> string -> bool) =
+        { new IActionInvoker with
+            member x.InvokeAction(ctx, actionName) = f ctx actionName }
     static member BuildControllerFromAction (action: FAction) =
-        new FigmentController(action, DefaultControllerFilters)
+        { new Controller() with 
+            override x.CreateActionInvoker() = 
+                upcast { new ControllerActionInvoker() with
+                            override y.FindAction(ctx, descriptor, actionName) = 
+                                { new ActionDescriptor() with
+                                    override z.ActionName = actionName
+                                    override z.ControllerDescriptor = 
+                                        { new ControllerDescriptor() with
+                                            override a.ControllerType = x.GetType()
+                                            override a.FindAction(ctx, actionName) = z
+                                            override a.GetCanonicalActions() = [|z|] }
+                                    override z.Execute(ctx, param) = upcast action ctx
+                                    override z.GetParameters() = [||] } } }
 
     static member BuildControllerFromAsyncAction (action: FAsyncAction) =
         new FigmentAsyncController(action, DefaultControllerFilters)
-
 
 /// case-insensitive string comparison
 let (=.) (x: string) (y: string) = 

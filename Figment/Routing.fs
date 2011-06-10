@@ -23,12 +23,13 @@ type ActionRegistration = {
         {routeName = routeName; action = action; route = route}
 
 type RouteCollection with
+    member private this.GetDefaultRouteValueDictionary() =
+        RouteValueDictionary(dict ["controller", box "Views"; "action", box "figment"])
     member private this.MapAction(routeConstraint: RouteConstraint, handler: IRouteHandler) = 
-        let defaults = RouteValueDictionary(dict ["controller", "Views" :> obj])
         let route = {new RouteBase() with
-                        override this.GetRouteData ctx = 
-                            let data = RouteData(routeHandler = handler, route = this)
-                            for d in defaults do
+                        override x.GetRouteData ctx = 
+                            let data = RouteData(routeHandler = handler, route = x)
+                            for d in this.GetDefaultRouteValueDictionary() do
                                 data.Values.Add(d.Key, d.Value)
                             if routeConstraint (ctx, data)
                                 then data
@@ -48,10 +49,9 @@ type RouteCollection with
         ()
 
     member private this.MapWithMethod(url, routeName, httpMethod, handler) = 
-        let defaults = RouteValueDictionary(dict [("controller", "Views" :> obj)])
         let httpMethodConstraint = HttpMethodConstraint([| httpMethod |])
         let constraints = RouteValueDictionary(dict [("httpMethod", httpMethodConstraint :> obj)])
-        let route = Route(url, defaults, constraints, handler)
+        let route = Route(url, this.GetDefaultRouteValueDictionary(), constraints, handler)
         this.Add(routeName, route)
         route
 
