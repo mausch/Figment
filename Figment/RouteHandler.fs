@@ -12,7 +12,7 @@ open Extensions
 
 type FigmentHandler(context: RequestContext, action: FAction) =
     member this.ProcessRequest(ctx: HttpContextBase) = 
-        let controller = Helper.BuildControllerFromAction action
+        let controller = buildControllerFromAction action
         ctx.Request.DisableValidation() |> ignore
         controller.ValidateRequest <- false
         (controller :> IController).Execute context
@@ -25,7 +25,7 @@ type FigmentHandler(context: RequestContext, action: FAction) =
 
 type FigmentAsyncHandler(context: RequestContext, action: FAsyncAction) = 
     member this.ProcessRequest(ctx: HttpContextBase) = 
-        let controller = Helper.BuildControllerFromAsyncAction action
+        let controller = buildControllerFromAsyncAction action
         ctx.Request.DisableValidation() |> ignore
         controller.ValidateRequest <- false
         (controller :> IController).Execute context
@@ -37,7 +37,7 @@ type FigmentAsyncHandler(context: RequestContext, action: FAsyncAction) =
             this.ProcessRequest(HttpContextWrapper(ctx))
         member this.BeginProcessRequest(ctx, cb, state) = 
             Debug.WriteLine "BeginProcessRequest"
-            let controller = Helper.BuildControllerFromAsyncAction action :> IAsyncController
+            let controller = buildControllerFromAsyncAction action :> IAsyncController
             controller.BeginExecute(context, cb, state)
 
         member this.EndProcessRequest r =
