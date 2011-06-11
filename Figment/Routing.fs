@@ -11,6 +11,7 @@ open Helpers
 open Extensions
 open Microsoft.FSharp.Reflection
 open RoutingConstraints
+open RouteHandlerHelpers
 
 type HttpMethod = GET | POST | HEAD | DELETE | PUT
 
@@ -39,12 +40,12 @@ type RouteCollection with
         route
 
     member this.MapAction(routeConstraint: RouteConstraint, action: FAction) = 
-        let handler = FigmentRouteHandler(action)
+        let handler = buildRouteHandler action
         let route = this.MapAction(routeConstraint, handler)
         ()
 
     member this.MapAction(routeConstraint: RouteConstraint, action: FAsyncAction) = 
-        let handler = FigmentAsyncRouteHandler(action)
+        let handler = buildAsyncRouteHandler action
         let route = this.MapAction(routeConstraint, handler)
         ()
 
@@ -56,12 +57,12 @@ type RouteCollection with
         route
 
     member this.MapWithMethod(url, routeName, httpMethod, action: FAction) =
-        let handler = FigmentRouteHandler(action)
+        let handler = buildRouteHandler action
         let route = this.MapWithMethod(url, routeName, httpMethod, handler)
         ()
 
     member this.MapWithMethod(url, routeName, httpMethod, action: FAsyncAction) =
-        let handler = FigmentAsyncRouteHandler(action)
+        let handler = buildAsyncRouteHandler action
         let route = this.MapWithMethod(url, routeName, httpMethod, handler)
         ()
 
