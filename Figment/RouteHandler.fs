@@ -44,10 +44,10 @@ type FigmentAsyncHandler(context: RequestContext, action: FAsyncAction) =
             Debug.WriteLine "EndProcessRequest"
 
 module RouteHandlerHelpers =
-    let buildActionRouteHandler (action: FAction) = 
+    let inline buildActionRouteHandler (action: FAction) = 
         buildRouteHandler (fun ctx -> upcast FigmentHandler(ctx, action))
 
-    let buildAsyncActionRouteHandler (action: FAsyncAction) =
+    let inline buildAsyncActionRouteHandler (action: FAsyncAction) =
         buildRouteHandler (fun ctx -> upcast FigmentAsyncHandler(ctx, action))
 
 type RouteConstraintParameters = {

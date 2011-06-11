@@ -78,16 +78,16 @@ type RouteCollection with
     member this.MapPost(url, routeName, action: FAsyncAction) =
         this.MapWithMethod(url, routeName, "POST", action)
 
-let action (routeConstraint: RouteConstraint) (action: FAction) = 
+let inline action (routeConstraint: RouteConstraint) (action: FAction) = 
     RouteTable.Routes.MapAction(routeConstraint, action)
 
-let asyncAction (routeConstraint: RouteConstraint) (action: FAsyncAction) = 
+let inline asyncAction (routeConstraint: RouteConstraint) (action: FAsyncAction) = 
     RouteTable.Routes.MapAction(routeConstraint, action)
 
-let get url (action: FAction) =
+let inline get url (action: FAction) =
     RouteTable.Routes.MapGet(url, null, action)
 
-let getn url routeName (action: FAction) =
+let inline getn url routeName (action: FAction) =
     RouteTable.Routes.MapGet(url, routeName, action)
 
 let stripFormatting s =
@@ -117,10 +117,10 @@ let getnf (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) routeName (act
         FSharpValue.InvokeFunction action values :?> ActionResult
     getn url routeName realAction
 
-let getf (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) (action: 'a -> 'b) = 
+let inline getf (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) (action: 'a -> 'b) = 
     getnf fmt null action
 
-let post url (action: FAction) =
+let inline post url (action: FAction) =
     RouteTable.Routes.MapPost(url, null, action)
 
 let register (httpMethod: HttpMethod) url action =
@@ -129,5 +129,5 @@ let register (httpMethod: HttpMethod) url action =
     | POST -> post url action
     | _ -> failwith "Not supported"
 
-let clear () =
+let inline clear () =
     RouteTable.Routes.Clear()

@@ -54,11 +54,11 @@ type FigmentAsyncController(action: FAsyncAction, filters: ControllerFilters) =
         member this.Execute r = 
             Debug.WriteLine "Execute"
 
-let buildRouteHandler f =
+let inline buildRouteHandler f =
     { new IRouteHandler with
         member x.GetHttpHandler ctx = f ctx }
 
-let buildActionInvoker f =
+let inline buildActionInvoker f =
     { new IActionInvoker with
         member x.InvokeAction(ctx, actionName) = f ctx actionName }
 
@@ -77,15 +77,15 @@ let buildControllerFromAction (action: FAction) =
                                 override z.Execute(ctx, param) = upcast action ctx
                                 override z.GetParameters() = [||] } } }
 
-let buildControllerFromAsyncAction (action: FAsyncAction) =
+let inline buildControllerFromAsyncAction (action: FAsyncAction) =
     new FigmentAsyncController(action, DefaultControllerFilters)
 
 /// case-insensitive string comparison
-let (=.) (x: string) (y: string) = 
+let inline (=.) (x: string) (y: string) = 
     StringComparer.InvariantCultureIgnoreCase.Compare(x,y) = 0
 
 /// case-insensitive string comparison
-let (<>.) (x: string) (y: string) =
+let inline (<>.) (x: string) (y: string) =
     StringComparer.InvariantCultureIgnoreCase.Compare(x,y) <> 0
 
 let uncheckedClass = Type.GetType "Microsoft.FSharp.Core.Operators+Unchecked, FSharp.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
@@ -95,7 +95,7 @@ let defaultValueOf (t: Type) =
     let genericMethod = defaultOfMethod.MakeGenericMethod [| t |]
     genericMethod.Invoke(null, null)
 
-let asyncf f x = 
+let inline asyncf f x = 
     async {
         return f x
     }
