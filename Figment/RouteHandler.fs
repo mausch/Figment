@@ -49,32 +49,3 @@ module RouteHandlerHelpers =
 
     let inline buildAsyncActionRouteHandler (action: FAsyncAction) =
         buildRouteHandler (fun ctx -> upcast FigmentAsyncHandler(ctx, action))
-
-type RouteConstraintParameters = {
-    Context: HttpContextBase
-    Route: Route
-    ParameterName: string
-    Values: RouteValueDictionary
-    Direction: RouteDirection
-}
-    
-type FigmentRouteConstraint(f: RouteConstraintParameters -> bool) =
-    interface IRouteConstraint with
-        member x.Match(ctx, route, parameterName, values, direction) = 
-            f {Context = ctx; Route = route; ParameterName = parameterName; Values = values; Direction = direction}
-
-type FigmentSimpleRouteConstraint(f: HttpContextBase -> bool) =
-    interface IRouteConstraint with
-        member x.Match(ctx, route, parameterName, values, direction) = f ctx
-
-(*
-type FigmentRoute(action: ControllerContext -> ActionResult, acceptRoute: HttpContextBase -> bool) =
-    inherit RouteBase()
-
-    override this.GetRouteData ctx = 
-        if acceptRoute ctx
-            then RouteData(this, FigmentRouteHandler(action))
-            else null
-
-    override this.GetVirtualPath (ctx, routeValues) = null
-*)
