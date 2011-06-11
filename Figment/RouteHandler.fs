@@ -44,13 +44,11 @@ type FigmentAsyncHandler(context: RequestContext, action: FAsyncAction) =
             Debug.WriteLine "EndProcessRequest"
 
 module RouteHandlerHelpers =
-    let buildRouteHandler (action: FAction) =
-        { new IRouteHandler with
-            member x.GetHttpHandler ctx = upcast FigmentHandler(ctx, action) }
+    let buildActionRouteHandler (action: FAction) = 
+        buildRouteHandler (fun ctx -> upcast FigmentHandler(ctx, action))
 
-    let buildAsyncRouteHandler (action: FAsyncAction) =
-        { new IRouteHandler with
-            member x.GetHttpHandler ctx = upcast FigmentAsyncHandler(ctx, action) }
+    let buildAsyncActionRouteHandler (action: FAsyncAction) =
+        buildRouteHandler (fun ctx -> upcast FigmentAsyncHandler(ctx, action))
 
 type RouteConstraintParameters = {
     Context: HttpContextBase

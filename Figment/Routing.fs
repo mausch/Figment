@@ -40,12 +40,12 @@ type RouteCollection with
         route
 
     member this.MapAction(routeConstraint: RouteConstraint, action: FAction) = 
-        let handler = buildRouteHandler action
+        let handler = buildActionRouteHandler action
         let route = this.MapAction(routeConstraint, handler)
         ()
 
     member this.MapAction(routeConstraint: RouteConstraint, action: FAsyncAction) = 
-        let handler = buildAsyncRouteHandler action
+        let handler = buildAsyncActionRouteHandler action
         let route = this.MapAction(routeConstraint, handler)
         ()
 
@@ -57,12 +57,12 @@ type RouteCollection with
         route
 
     member this.MapWithMethod(url, routeName, httpMethod, action: FAction) =
-        let handler = buildRouteHandler action
+        let handler = buildActionRouteHandler action
         let route = this.MapWithMethod(url, routeName, httpMethod, handler)
         ()
 
     member this.MapWithMethod(url, routeName, httpMethod, action: FAsyncAction) =
-        let handler = buildAsyncRouteHandler action
+        let handler = buildAsyncActionRouteHandler action
         let route = this.MapWithMethod(url, routeName, httpMethod, handler)
         ()
 

@@ -3,6 +3,7 @@
 open System
 open System.Reflection
 open System.Web
+open System.Web.Routing
 open System.Web.Mvc
 open System.Web.Mvc.Async
 
@@ -53,7 +54,11 @@ type FigmentAsyncController(action: FAsyncAction, filters: ControllerFilters) =
         member this.Execute r = 
             Debug.WriteLine "Execute"
 
-let buildActionInvoker (f: ControllerContext -> string -> bool) =
+let buildRouteHandler f =
+    { new IRouteHandler with
+        member x.GetHttpHandler ctx = f ctx }
+
+let buildActionInvoker f =
     { new IActionInvoker with
         member x.InvokeAction(ctx, actionName) = f ctx actionName }
 
