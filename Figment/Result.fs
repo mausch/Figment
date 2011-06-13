@@ -67,7 +67,7 @@ let charset c =
     result (fun ctx -> ctx.Response.Charset <- c)
 
 let header name value =
-    result (fun ctx -> ctx.Response.Headers.Add(name, value))
+    result (fun ctx -> ctx.Response.AppendHeader(name, value))
 
 let vary field = header "Vary" field
 
