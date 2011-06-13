@@ -201,6 +201,12 @@ module Extensions =
                 x.Write Environment.NewLine
             Printf.ksprintf printn fmt
 
+    type HttpContextBase with
+        member x.GetService() : 'a =
+            unbox (x.GetService typeof<'a>)
+        member x.UnderlyingHttpContext = 
+            x.GetService<HttpApplication>().Context
+
     type HttpSessionStateBase with
         member x.Get (n: string) = unbox x.[n]
         member x.Set (n: string) v = x.[n] <- v
