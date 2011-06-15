@@ -71,6 +71,8 @@ let header name value =
 
 let vary field = header "Vary" field
 
+let allow (methods: #seq<string>) = header "Allow" (System.String.Join(", ", methods))
+
 let file contentType stream =
     FileStreamResult(stream, contentType) :> ActionResult
 
