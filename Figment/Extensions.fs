@@ -6,6 +6,7 @@ open System.Collections.Generic
 open System.Reflection
 open System.Web
 open System.Web.Mvc
+open System.Web.Routing
 open Microsoft.FSharp.Reflection
 open System.Text.RegularExpressions
 open System.Web.Caching
@@ -166,6 +167,17 @@ module Extensions =
             if not (FSharpType.IsFunction(r.GetType()))
                 then box r
                 else FSharpValue.InvokeFunction r (List.tail args)
+
+    type RouteCollection with
+        /// <summary>
+        /// Shallow clone of routes.
+        /// Does not copy route names.
+        /// </summary>
+        member x.Clone() =
+            let r = RouteCollection()
+            use lok = x.GetReadLock()
+            Seq.iter r.Add x
+            r
 
     type Cache with
         member x.GetOrAdd(key: string, valueFactory: string -> 'a, ?dependencies, ?absoluteExpiration, ?slidingExpiration, ?priority, ?onRemoveCallback): 'a = 
