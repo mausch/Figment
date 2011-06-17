@@ -73,8 +73,14 @@ let vary = header "Vary"
 
 let allow (methods: #seq<string>) = header "Allow" (System.String.Join(", ", methods))
 
-let file contentType stream =
-    FileStreamResult(stream, contentType) :> ActionResult
+let fileStream contentType name stream =
+    FileStreamResult(stream, contentType, FileDownloadName = name) :> ActionResult
+
+let filePath contentType path =
+    FilePathResult(path, contentType) :> ActionResult
+
+let fileContent contentType name bytes =
+    FileContentResult(bytes, contentType, FileDownloadName = name) :> ActionResult
 
 let json data =
     JsonResult(Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet) :> ActionResult
