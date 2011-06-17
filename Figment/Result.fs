@@ -69,7 +69,7 @@ let charset c =
 let header name value =
     result (fun ctx -> ctx.Response.AppendHeader(name, value))
 
-let vary field = header "Vary" field
+let vary = header "Vary"
 
 let allow (methods: #seq<string>) = header "Allow" (System.String.Join(", ", methods))
 
