@@ -2,12 +2,14 @@
 
 open System.Web.Mvc
 open Figment.Helpers
+open Figment.Result
 
 // operators
-let concat (a: FAction) (b: FAction) (ctx: ControllerContext) =
-    let x = a ctx
-    let y = b ctx
-    Result.concat x y
+let concat (a: FAction) (b: FAction) : FAction =
+    fun ctx ->
+        let x = a ctx
+        let y = b ctx
+        x >>> y
 
 let (=>) = concat
 

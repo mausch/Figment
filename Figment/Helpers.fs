@@ -9,9 +9,11 @@ open System.Web.Mvc.Async
 
 open System.Diagnostics
 
-type FAction = ControllerContext -> ActionResult
+type FResult = ControllerContext -> unit
 
-type FAsyncAction = ControllerContext -> Async<ActionResult>
+type FAction = ControllerContext -> FResult
+
+type FAsyncAction = ControllerContext -> Async<FResult>
 
 type ControllerFilters = {
     actionExecutedFilter: ActionExecutedContext -> unit
@@ -44,7 +46,7 @@ type FigmentAsyncController(action: FAsyncAction, filters: ControllerFilters) =
             let callback r = 
                 Debug.WriteLine "BeginExecute callback"
                 let result = aend r
-                result.ExecuteResult controllerContext
+                result controllerContext
                 cb.Invoke r
 
             abegin(controllerContext, AsyncCallback(callback), null)

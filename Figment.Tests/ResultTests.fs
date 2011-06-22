@@ -22,7 +22,7 @@ let ``status result``() =
                                     and set v = statusCode := v } }
         let req = RequestContext(ctx, RouteData())
         ControllerContext(req, dummyController)
-    status 200 |> exec ctx
+    status 200 ctx
     Assert.Equal(200, ctx.HttpContext.Response.StatusCode)
 
 [<Fact>]
@@ -42,6 +42,6 @@ let ``JSONP content type is application/javascript``() =
                                     sb.Append s |> ignore } }
         let req = RequestContext(ctx, RouteData())
         ControllerContext(req, dummyController)
-    jsonp callback "something" |> exec ctx
+    jsonp callback "something" ctx
     Assert.Equal("callback(\"something\")", sb.ToString())
     Assert.Equal("application/javascript", ctx.HttpContext.Response.ContentType)

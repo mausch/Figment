@@ -109,15 +109,15 @@ let rec bindAll (fTypes: Type list) (parameters: string list) (ctx: ControllerCo
         let v = bindSingleParameterNG hd (List.head parameters) ctx.Controller.ValueProvider ctx
         v::bindAll tl (List.tail parameters) ctx
 
-let getnf (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) routeName (action: 'a -> 'b) =
+let getnf (fmt: PrintfFormat<'a -> 'b, unit, unit, FResult>) routeName (action: 'a -> 'b) =
     let url, parameters = stripFormatting fmt.Value
     let args = FSharpType.GetFlattenedFunctionElements(action.GetType())
     let realAction ctx = 
         let values = bindAll args parameters ctx
-        FSharpValue.InvokeFunction action values :?> ActionResult
+        FSharpValue.InvokeFunction action values :?> FResult
     getn url routeName realAction
 
-let inline getf (fmt: PrintfFormat<'a -> 'b, unit, unit, ActionResult>) (action: 'a -> 'b) = 
+let inline getf (fmt: PrintfFormat<'a -> 'b, unit, unit, FResult>) (action: 'a -> 'b) = 
     getnf fmt null action
 
 let inline post url (action: FAction) =
