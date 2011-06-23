@@ -8,20 +8,26 @@ open System.Web.Mvc
 open Figment.Result
 open Xunit
 
-let dummyController = { new ControllerBase() with member x.ExecuteCore() = () }
+let buildCtx = 
+    let dummyController = { new ControllerBase() with member x.ExecuteCore() = () }
+    fun ctx ->
+        let req = RequestContext(ctx, RouteData())
+        ControllerContext(req, dummyController)
+
+let buildCtxFromResponse resp = 
+    buildCtx 
+        { new HttpContextBase() with
+            member x.Response = resp }
 
 [<Fact>]
 let ``status result``() =
     let ctx = 
         let statusCode = ref 0
-        let ctx = { new HttpContextBase() with 
-                        member x.Response = 
-                            { new HttpResponseBase() with
-                                member x.StatusCode 
-                                    with get() = !statusCode
-                                    and set v = statusCode := v } }
-        let req = RequestContext(ctx, RouteData())
-        ControllerContext(req, dummyController)
+        buildCtxFromResponse
+            { new HttpResponseBase() with
+                member x.StatusCode 
+                    with get() = !statusCode
+                    and set v = statusCode := v }
     status 200 ctx
     Assert.Equal(200, ctx.HttpContext.Response.StatusCode)
 
@@ -32,16 +38,13 @@ let ``JSONP content type is application/javascript``() =
     let sb = StringBuilder()
     let ctx = 
         let contentType = ref ""
-        let ctx = { new HttpContextBase() with 
-                        member x.Response = 
-                            { new HttpResponseBase() with
-                                member x.ContentType
-                                    with get() = !contentType
-                                    and set v = contentType := v
-                                member x.Write(s: string) = 
-                                    sb.Append s |> ignore } }
-        let req = RequestContext(ctx, RouteData())
-        ControllerContext(req, dummyController)
+        buildCtxFromResponse 
+            { new HttpResponseBase() with
+                member x.ContentType
+                    with get() = !contentType
+                    and set v = contentType := v
+                member x.Write(s: string) = 
+                    sb.Append s |> ignore }
     jsonp callback "something" ctx
     Assert.Equal("callback(\"something\")", sb.ToString())
     Assert.Equal("application/javascript", ctx.HttpContext.Response.ContentType)

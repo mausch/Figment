@@ -28,6 +28,7 @@ let urlMatchesTest() =
                 override x.Request = {new HttpRequestBase() with
                     override x.Url = Uri("http://localhost/something")}}
     let route = RouteData()
-    Assert.True(ifUrlMatches "^/some" (ctx, route))
-    Assert.False(ifUrlMatches "^/some$" (ctx, route))
+    let c = ctx, route
+    Assert.True(ifUrlMatches "^/some" c)
+    Assert.False(ifUrlMatches "^/some$" c)
     ()
