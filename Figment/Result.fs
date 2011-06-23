@@ -7,20 +7,6 @@ open System.Web.Routing
 open Figment.Helpers
 open Figment.Extensions
 
-let inline toActionResult r = 
-    {new ActionResult() with
-        override x.ExecuteResult ctx = 
-            if ctx = null
-                then raise <| System.ArgumentNullException("ctx")
-                else r ctx }
-
-
-let inline exec ctx (r: ActionResult) =
-    r.ExecuteResult ctx
-
-let inline fromActionResult a : FResult =
-    fun ctx -> exec ctx a
-
 let result = ReaderBuilder()
 
 let empty : FResult = EmptyResult() |> fromActionResult
