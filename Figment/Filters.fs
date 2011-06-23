@@ -10,14 +10,14 @@ open Figment.Helpers
 
 module private Internals = 
 
-    let internal irequireHttps (action: ControllerContext -> 'a) (redirect: string -> 'a) (ctx: ControllerContext): 'a =
+    let internal irequireHttps (action: ControllerContext -> 'a) redirect (ctx: ControllerContext): 'a =
         if ctx.HttpContext.Request.IsSecureConnection 
             then action ctx
             else
                 let request = ctx.HttpContext.Request
                 if request.HttpMethod <>. "GET"
                     then failwithf "HTTPS required for %s" request.RawUrl
-                redirect (sprintf "https://%s%s" request.Url.Host request.RawUrl)
+                redirect (sprintf "https://%s%s" request.Url.Host request.RawUrl) ctx
 
 module Filters = 
 
@@ -31,12 +31,13 @@ module Filters =
                 let roleMatch = allowedRoles.Length = 0 || Enumerable.Any(allowedRoles, fun r -> user.IsInRole r)
                 userMatch && roleMatch
 
-    let authorize (allowedUsers: string list) (allowedRoles: string list) (action: FAction) (ctx: ControllerContext) = 
-        let user = ctx.HttpContext.User
-        let authorized = user |> hasAuthorization allowedUsers allowedRoles
-        if authorized 
-            then action ctx
-            else unauthorized
+    let authorize (allowedUsers: string list) (allowedRoles: string list) (action: FAction) : FAction = 
+        fun ctx ->
+            let user = ctx.HttpContext.User
+            let authorized = user |> hasAuthorization allowedUsers allowedRoles
+            if authorized 
+                then action ctx
+                else unauthorized ctx
 
     let cache (settings: OutputCacheParameters) (action: FAction) : FAction =
         fun ctx ->
@@ -45,14 +46,15 @@ module Filters =
             // TODO set the other cache parameters
             action ctx
 
-    let requireHttps (action: FAction) = 
+    let requireHttps (action: FAction) : FAction = 
         Internals.irequireHttps action redirect
 
     let apply (filter: Filter) (actions: seq<string * FAction>) =
         actions |> Seq.map (fun (k,v) -> (k, filter v))
 
 module AsyncFilters = 
-    let requireHttps (action: FAsyncAction) = 
-        Internals.irequireHttps action (asyncf redirect)
+    let requireHttps (action: FAsyncAction) : FAsyncAction = 
+        fun ctx ->
+            Internals.irequireHttps action (fun s ctx -> async.Return (redirect s ctx)) <| ctx
 
     // TODO implement other filters for async actions

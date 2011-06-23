@@ -9,7 +9,7 @@ open Figment.Extensions
 
 let result = ReaderBuilder()
 
-let empty : FResult = EmptyResult() |> fromActionResult
+let empty : FAction = EmptyResult() |> fromActionResult
 
 let view viewName model = 
     let viewData = ViewDataDictionary(Model = model)
@@ -39,18 +39,18 @@ let redirectf f = Printf.kprintf redirect f
 let redirectToRoute (routeValues: RouteValueDictionary) =
     RedirectToRouteResult(routeValues) |> fromActionResult
 
-let unauthorized : FResult = HttpUnauthorizedResult() |> fromActionResult
+let unauthorized : FAction = HttpUnauthorizedResult() |> fromActionResult
 
-let status code : FResult =
+let status code : FAction =
     fun ctx -> ctx.Response.StatusCode <- code
 
-let contentType t : FResult  =
+let contentType t : FAction =
     fun ctx -> ctx.Response.ContentType <- t
 
-let charset c : FResult =
+let charset c : FAction  =
     fun ctx -> ctx.Response.Charset <- c
 
-let header name value : FResult =
+let header name value : FAction  =
     fun ctx -> ctx.Response.AppendHeader(name, value)
 
 let vary x = header "Vary" x
@@ -69,7 +69,7 @@ let fileContent contentType name bytes =
 let json data =
     JsonResult(Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet) |> fromActionResult
 
-let write (text: string) : FResult =
+let write (text: string) : FAction =
     fun ctx ->
         ctx.Response.Write text
 

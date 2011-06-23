@@ -9,11 +9,9 @@ open System.Web.Mvc.Async
 
 open System.Diagnostics
 
-type FResult = ControllerContext -> unit
+type FAction = ControllerContext -> unit
 
-type FAction = ControllerContext -> FResult
-
-type FAsyncAction = ControllerContext -> Async<FResult>
+type FAsyncAction = ControllerContext -> Async<unit>
 
 let inline buildActionResult r = 
     {new ActionResult() with
@@ -22,11 +20,10 @@ let inline buildActionResult r =
                 then raise <| System.ArgumentNullException("ctx")
                 else r ctx }
 
-
 let inline exec ctx (r: ActionResult) =
     r.ExecuteResult ctx
 
-let inline fromActionResult a : FResult =
+let inline fromActionResult a : FAction =
     fun ctx -> exec ctx a
 
 type ControllerFilters = {
@@ -59,8 +56,7 @@ type FigmentAsyncController(action: FAsyncAction, filters: ControllerFilters) =
             let abegin, aend, acancel = Async.AsBeginEnd action
             let callback r = 
                 Debug.WriteLine "BeginExecute callback"
-                let result = aend r
-                result controllerContext
+                aend r
                 cb.Invoke r
 
             abegin(controllerContext, AsyncCallback(callback), null)
@@ -90,7 +86,9 @@ let buildControllerFromAction (action: FAction) =
                                         override a.ControllerType = x.GetType()
                                         override a.FindAction(ctx, actionName) = z
                                         override a.GetCanonicalActions() = [|z|] }
-                                override z.Execute(ctx, param) = action ctx |> buildActionResult |> box
+                                override z.Execute(ctx, param) = 
+                                    action ctx
+                                    buildActionResult (fun _ -> ()) |> box
                                 override z.GetParameters() = [||] } } }
 
 let inline buildControllerFromAsyncAction (action: FAsyncAction) =

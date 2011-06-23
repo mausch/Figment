@@ -40,7 +40,6 @@
     <Compile Include="RouteHandler.fs" />
     <Compile Include="Result.fs" />
     <Compile Include="Binding.fs" />
-    <Compile Include="Actions.fs" />
     <Compile Include="RoutingConstraints.fs" />
     <Compile Include="Routing.fs" />
     <Compile Include="Filters.fs" />
