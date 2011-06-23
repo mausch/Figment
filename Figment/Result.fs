@@ -21,27 +21,7 @@ let inline exec ctx (r: ActionResult) =
 let inline fromActionResult a : FResult =
     fun ctx -> exec ctx a
 
-(*
-let concat a b =
-    fun ctx ->
-        a ctx
-        b ctx
-
-let (>>.) = concat
-*)
-
-type ResultBuilder() =
-    member x.Bind(m: ControllerContext -> 'a, f: 'a -> ControllerContext -> 'b) = 
-        fun ctx ->
-            let x = m ctx
-            f x ctx
-    member x.Return a = 
-        fun (c: ControllerContext) -> a
-    member x.ReturnFrom a = a
-
-let FActionResult = ResultBuilder()
-
-let inline (>>>) m f = FActionResult.Bind(m, fun () -> f)
+let result = ReaderBuilder()
 
 let empty : FResult = EmptyResult() |> fromActionResult
 
@@ -110,7 +90,7 @@ let write (text: string) : FResult =
 let writefn fmt = Printf.kprintf write fmt
 
 let jsonp callback data =
-    FActionResult {
+    result {
         let! cb = callback
         do! write cb
         do! write "("
@@ -118,6 +98,8 @@ let jsonp callback data =
         do! write ")"
         do! contentType "application/javascript"
     }
+
+open Figment.ReaderOperators
 
 let xml data = 
     // charset?
