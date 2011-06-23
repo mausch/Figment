@@ -1,11 +1,8 @@
 ﻿namespace Figment
 
 type ReaderBuilder() =
-    member x.Bind(m: 'a -> 'b, f: 'b -> 'a -> 'c) =
-        fun c ->
-            let x = m c
-            f x c
-    member x.Return a = fun c -> a
+    member x.Bind(m, f) = fun c -> f (m c) c
+    member x.Return a = fun _ -> a
     member x.ReturnFrom a = a
     member x.map f m = x.Bind(m, fun a -> x.Return (f a))
 
