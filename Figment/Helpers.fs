@@ -15,7 +15,7 @@ type FAction = ControllerContext -> FResult
 
 type FAsyncAction = ControllerContext -> Async<FResult>
 
-let inline toActionResult r = 
+let inline buildActionResult r = 
     {new ActionResult() with
         override x.ExecuteResult ctx = 
             if ctx = null
@@ -90,7 +90,7 @@ let buildControllerFromAction (action: FAction) =
                                         override a.ControllerType = x.GetType()
                                         override a.FindAction(ctx, actionName) = z
                                         override a.GetCanonicalActions() = [|z|] }
-                                override z.Execute(ctx, param) = action ctx |> toActionResult |> box
+                                override z.Execute(ctx, param) = action ctx |> buildActionResult |> box
                                 override z.GetParameters() = [||] } } }
 
 let inline buildControllerFromAsyncAction (action: FAsyncAction) =
