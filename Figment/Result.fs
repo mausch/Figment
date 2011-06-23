@@ -103,7 +103,7 @@ open Figment.ReaderOperators
 
 let xml data = 
     // charset?
-    contentType "text/xml" >>>
+    contentType "text/xml" >>.
     (fun ctx ->
         let serializer = System.Xml.Serialization.XmlSerializer(data.GetType())
         serializer.Serialize(ctx.HttpContext.Response.Output, data))

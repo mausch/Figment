@@ -10,4 +10,4 @@ type ReaderBuilder() =
 
 module ReaderOperators =
     let internal r = ReaderBuilder()
-    let (>>>) m f = r.Bind(m, fun _ -> f)
+    let (>>.) m f = r.Bind(m, fun _ -> f)
