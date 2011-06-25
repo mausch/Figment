@@ -10,31 +10,47 @@ open Figment.Helpers
 open System.Diagnostics
 open Extensions
 
+type IHttpHandlerBase =
+    abstract ProcessRequest: HttpContextBase -> unit
+
+type IControllerProvider =
+    abstract CreateController: unit -> IController
+
 type FigmentHandler(context: RequestContext, action: FAction) =
-    member this.ProcessRequest(ctx: HttpContextBase) = 
+    let proc (ctx: HttpContextBase) =
         let controller = buildControllerFromAction action
         ctx.Request.DisableValidation() |> ignore
         controller.ValidateRequest <- false
         (controller :> IController).Execute context
 
+    interface IControllerProvider with
+        member this.CreateController() = upcast buildControllerFromAction action
+
+    interface IHttpHandlerBase with
+        member this.ProcessRequest(ctx: HttpContextBase) = proc ctx
+
     interface System.Web.SessionState.IRequiresSessionState
     interface IHttpHandler with
         member this.IsReusable = false
-        member this.ProcessRequest ctx =
-            this.ProcessRequest(HttpContextWrapper(ctx))
+        member this.ProcessRequest ctx = HttpContextWrapper(ctx) |> proc
 
 type FigmentAsyncHandler(context: RequestContext, action: FAsyncAction) = 
-    member this.ProcessRequest(ctx: HttpContextBase) = 
+    let proc (ctx: HttpContextBase) =
         let controller = buildControllerFromAsyncAction action
         ctx.Request.DisableValidation() |> ignore
         controller.ValidateRequest <- false
         (controller :> IController).Execute context
 
+    interface IControllerProvider with
+        member this.CreateController() = upcast buildControllerFromAsyncAction action
+
+    interface IHttpHandlerBase with
+        member this.ProcessRequest(ctx: HttpContextBase) = proc ctx
+
     interface System.Web.SessionState.IRequiresSessionState
     interface IHttpAsyncHandler with
         member this.IsReusable = false
-        member this.ProcessRequest ctx =
-            this.ProcessRequest(HttpContextWrapper(ctx))
+        member this.ProcessRequest ctx = HttpContextWrapper(ctx) |> proc
         member this.BeginProcessRequest(ctx, cb, state) = 
             Debug.WriteLine "BeginProcessRequest"
             let controller = buildControllerFromAsyncAction action :> IAsyncController
