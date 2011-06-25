@@ -17,7 +17,7 @@ let view viewName model =
 
 let notFound () = raise <| HttpException(404, "Not found")
 
-let notFoundOrView viewName =    
+let notFoundOrView viewName = 
     function
     | None -> notFound()
     | Some x -> view viewName x

@@ -20,11 +20,8 @@ let inline buildActionResult r =
                 then raise <| System.ArgumentNullException("ctx")
                 else r ctx }
 
-let inline exec ctx (r: ActionResult) =
-    r.ExecuteResult ctx
-
-let inline fromActionResult a : FAction =
-    fun ctx -> exec ctx a
+let inline fromActionResult (a: ActionResult) : FAction =
+    a.ExecuteResult
 
 type ControllerFilters = {
     actionExecutedFilter: ActionExecutedContext -> unit
@@ -88,7 +85,7 @@ let buildControllerFromAction (action: FAction) =
                                         override a.GetCanonicalActions() = [|z|] }
                                 override z.Execute(ctx, param) = 
                                     action ctx
-                                    buildActionResult (fun _ -> ()) |> box
+                                    buildActionResult ignore |> box
                                 override z.GetParameters() = [||] } } }
 
 let inline buildControllerFromAsyncAction (action: FAsyncAction) =
@@ -108,11 +105,6 @@ let defaultOfMethod = uncheckedClass.GetMethod "DefaultOf"
 let defaultValueOf (t: Type) =
     let genericMethod = defaultOfMethod.MakeGenericMethod [| t |]
     genericMethod.Invoke(null, null)
-
-let inline asyncf f x = 
-    async {
-        return f x
-    }
 
 let inline htmlencode x = HttpUtility.HtmlEncode x
 let inline urlencode (x: string) = HttpUtility.UrlEncode x
