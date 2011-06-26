@@ -12,6 +12,7 @@ open System.Text.RegularExpressions
 open System.Web.Caching
 open System.Linq
 
+[<AutoOpen>]
 module Extensions = 
     let internal bindingFlags = BindingFlags.NonPublic ||| BindingFlags.Instance
     let internal underlyingRequest = typeof<HttpRequestWrapper>.GetField("_httpRequest", bindingFlags)

@@ -6,6 +6,7 @@ type ReaderBuilder() =
     member x.ReturnFrom a = a
     member x.map f m = x.Bind(m, fun a -> x.Return (f a))
 
+[<AutoOpen>]
 module ReaderOperators =
     let internal r = ReaderBuilder()
     let (>>.) m f = r.Bind(m, fun _ -> f)

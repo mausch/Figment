@@ -1,63 +1,66 @@
-﻿module Figment.RoutingConstraints
+﻿namespace Figment
 
-open System.Text.RegularExpressions
-open System.Web
-open System.Web.Routing
+[<AutoOpen>]
+module RoutingConstraints =
 
-type RouteConstraint = HttpContextBase * RouteData -> bool
+    open System.Text.RegularExpressions
+    open System.Web
+    open System.Web.Routing
 
-(* operators *)
-let allOf (constraints: RouteConstraint list) (ctx: HttpContextBase, route: RouteData) = 
-    Seq.forall (fun c -> c(ctx,route)) constraints
+    type RouteConstraint = HttpContextBase * RouteData -> bool
 
-let anyOf (constraints: RouteConstraint list) (ctx: HttpContextBase, route: RouteData) = 
-    Seq.exists (fun c -> c(ctx,route)) constraints
+    (* operators *)
+    let allOf (constraints: RouteConstraint list) (ctx: HttpContextBase, route: RouteData) = 
+        Seq.forall (fun c -> c(ctx,route)) constraints
 
-let (||.) (x: RouteConstraint) (y: RouteConstraint) = anyOf [x;y]
+    let anyOf (constraints: RouteConstraint list) (ctx: HttpContextBase, route: RouteData) = 
+        Seq.exists (fun c -> c(ctx,route)) constraints
 
-let (&&.) (x: RouteConstraint) (y: RouteConstraint) = allOf [x;y]
+    let (||.) (x: RouteConstraint) (y: RouteConstraint) = anyOf [x;y]
 
-let (!.) (x: RouteConstraint) (ctx: HttpContextBase, route: RouteData) = 
-    not (x(ctx, route))
+    let (&&.) (x: RouteConstraint) (y: RouteConstraint) = allOf [x;y]
 
-(* constraints *)
-let any (ctx: HttpContextBase, route: RouteData) = true
+    let (!.) (x: RouteConstraint) (ctx: HttpContextBase, route: RouteData) = 
+        not (x(ctx, route))
 
-let ifPathIs (url: string) =
-    fun (ctx: HttpContextBase, route: RouteData) ->
-        ctx.Request.Url.AbsolutePath = "/"+url
+    (* constraints *)
+    let any (ctx: HttpContextBase, route: RouteData) = true
 
-let ifPathIsf fmt = Printf.ksprintf ifPathIs fmt
+    let ifPathIs (url: string) =
+        fun (ctx: HttpContextBase, route: RouteData) ->
+            ctx.Request.Url.AbsolutePath = "/"+url
 
-let ifUrlMatches (rx: string) =
-    if rx = null
-        then invalidArg "rx" "regex null"
-    let rxx = Regex(rx)
-    fun (ctx: HttpContextBase, route: RouteData) ->
-        rxx.IsMatch ctx.Request.Url.AbsolutePath
+    let ifPathIsf fmt = Printf.ksprintf ifPathIs fmt
 
-let ifMethodIs httpMethod = 
-    if httpMethod = null
-        then invalidArg "httpMethod" "httpMethod null"
-    fun (ctx: HttpContextBase, route: RouteData) -> 
-        ctx.Request.HttpMethod = httpMethod
+    let ifUrlMatches (rx: string) =
+        if rx = null
+            then invalidArg "rx" "regex null"
+        let rxx = Regex(rx)
+        fun (ctx: HttpContextBase, route: RouteData) ->
+            rxx.IsMatch ctx.Request.Url.AbsolutePath
 
-let ifMethodIsGet x = ifMethodIs "GET" x
-let ifMethodIsPost x = ifMethodIs "POST" x
-let ifMethodIsHead x = ifMethodIs "HEAD" x
-let ifMethodIsPut x = ifMethodIs "PUT" x
-let ifMethodIsOptions x = ifMethodIs "OPTIONS" x
+    let ifMethodIs httpMethod = 
+        if httpMethod = null
+            then invalidArg "httpMethod" "httpMethod null"
+        fun (ctx: HttpContextBase, route: RouteData) -> 
+            ctx.Request.HttpMethod = httpMethod
 
-let ifUserAgentMatches (rx: string) =
-    if rx = null
-        then invalidArg "rx" "regex null"
-    let rxx = Regex(rx)
-    fun (ctx: HttpContextBase, route: RouteData) ->
-        rxx.IsMatch ctx.Request.UserAgent
+    let ifMethodIsGet x = ifMethodIs "GET" x
+    let ifMethodIsPost x = ifMethodIs "POST" x
+    let ifMethodIsHead x = ifMethodIs "HEAD" x
+    let ifMethodIsPut x = ifMethodIs "PUT" x
+    let ifMethodIsOptions x = ifMethodIs "OPTIONS" x
 
-open System
-open Helpers
+    let ifUserAgentMatches (rx: string) =
+        if rx = null
+            then invalidArg "rx" "regex null"
+        let rxx = Regex(rx)
+        fun (ctx: HttpContextBase, route: RouteData) ->
+            rxx.IsMatch ctx.Request.UserAgent
 
-let ifIsAjax (ctx: HttpContextBase, route: RouteData) =
-    let requestedWith = ctx.Request.Headers.["X-Requested-With"]
-    requestedWith <> null && requestedWith =. "xmlhttprequest"
+    open System
+    open Helpers
+
+    let ifIsAjax (ctx: HttpContextBase, route: RouteData) =
+        let requestedWith = ctx.Request.Headers.["X-Requested-With"]
+        requestedWith <> null && requestedWith =. "xmlhttprequest"
