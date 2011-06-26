@@ -13,14 +13,17 @@ module Testing =
                 { new HttpRequestBase() with
                     override y.HttpMethod = verb
                     override y.RawUrl = path
-                    override y.PathInfo = ""
+                    override y.PathInfo = path
                     override y.AppRelativeCurrentExecutionFilePath = "~/"
+                    override y.Path = "/" + path
                     override y.Url = Uri("http://localhost/" + path) }}
 
     let getController verb path =
-        let route = buildRequest verb path |> RouteTable.Routes.GetRouteData
+        let ctx = buildRequest verb path
+        let route = RouteTable.Routes.GetRouteData ctx
         Debug.Assert(route <> null)
-        let handler : Figment.IControllerProvider = unbox <| route.RouteHandler.GetHttpHandler(RequestContext())
+        let rctx = RequestContext(ctx, route)
+        let handler : Figment.IControllerProvider = unbox <| route.RouteHandler.GetHttpHandler(rctx)
         Debug.Assert(box handler <> null)
         route, handler.CreateController()
 
