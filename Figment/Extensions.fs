@@ -180,6 +180,11 @@ module Extensions =
             Seq.iter r.Add x
             r
 
+        member x.tryGetRouteData ctx =
+            match x.GetRouteData ctx with
+            | null -> None
+            | a -> Some a
+
     type Cache with
         member x.GetOrAdd(key: string, valueFactory: string -> 'a, ?dependencies, ?absoluteExpiration, ?slidingExpiration, ?priority, ?onRemoveCallback): 'a = 
             let item = x.Get(key)

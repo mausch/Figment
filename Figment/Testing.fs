@@ -5,7 +5,23 @@ open System.Diagnostics
 open System.Web
 open System.Web.Routing
 
+module Option =
+    type MaybeBuilder() =
+        member x.Bind(a,f) = Option.bind f a
+        member x.Return v = Some v
+        member x.Zero() = None
+    let builder = MaybeBuilder()
+    let inline getOrElse v =
+        function
+        | Some v -> v
+        | _ -> v            
+
 module Testing =
+
+    type MaybeBuilder() =
+        member x.Bind(a,f) = Option.bind f a
+        member x.Return v = Some v
+        member x.Zero() = None
 
     let buildRequest verb path =
         { new HttpContextBase() with
@@ -18,14 +34,18 @@ module Testing =
                     override y.Path = "/" + path
                     override y.Url = Uri("http://localhost/" + path) }}
 
-    let getController verb path =
+    let tryGetController verb path =
         let ctx = buildRequest verb path
-        let route = RouteTable.Routes.GetRouteData ctx
-        Debug.Assert(route <> null)
-        let rctx = RequestContext(ctx, route)
-        let handler : Figment.IControllerProvider = unbox <| route.RouteHandler.GetHttpHandler(rctx)
-        Debug.Assert(box handler <> null)
-        route, handler.CreateController()
+        Option.builder {
+            let! route = RouteTable.Routes.tryGetRouteData ctx
+            let rctx = RequestContext(ctx, route)
+            let handler : Figment.IControllerProvider = unbox <| route.RouteHandler.GetHttpHandler(rctx)
+            return route, handler.CreateController()
+        }
+
+    let getController verb path =
+        tryGetController verb path
+        |> Option.getOrElse (failwithf "No controller found for %s %s" verb path)
 
     let buildResponse route resp =
         let ctx =
