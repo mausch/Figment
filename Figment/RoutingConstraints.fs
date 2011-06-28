@@ -43,7 +43,7 @@ module RoutingConstraints =
         if httpMethod = null
             then invalidArg "httpMethod" "httpMethod null"
         fun (ctx: HttpContextBase, route: RouteData) -> 
-            ctx.Request.HttpMethod = httpMethod
+            ctx.Request.HttpMethod =. httpMethod
 
     let ifMethodIsGet x = ifMethodIs "GET" x
     let ifMethodIsPost x = ifMethodIs "POST" x
