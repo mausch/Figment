@@ -18,11 +18,6 @@ module Option =
 
 module Testing =
 
-    type MaybeBuilder() =
-        member x.Bind(a,f) = Option.bind f a
-        member x.Return v = Some v
-        member x.Zero() = None
-
     let buildRequest verb path =
         { new HttpContextBase() with
             override x.Request = 
