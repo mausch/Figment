@@ -204,3 +204,6 @@ module Helpers =
             override x.RewritePath(filePath, pathInfo, querystring, setClientFilePath) = ctx.RewritePath(filePath, pathInfo, querystring, setClientFilePath)
             override x.ToString() = ctx.ToString()
 
+    let withRequest (req: HttpRequestBase) (ctx: HttpContextBase) =
+        { new DelegatingHttpContextBase(ctx) with
+            override x.Request = req }

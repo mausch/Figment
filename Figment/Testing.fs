@@ -11,10 +11,10 @@ module Option =
         member x.Return v = Some v
         member x.Zero() = None
     let builder = MaybeBuilder()
-    let inline getOrElse v =
+    let inline getOrElse f =
         function
         | Some v -> v
-        | _ -> v            
+        | _ -> f()  
 
 module Testing =
 
@@ -22,6 +22,7 @@ module Testing =
         { new HttpContextBase() with
             override x.Request = 
                 { new HttpRequestBase() with
+                    override y.ValidateInput() = ()
                     override y.HttpMethod = verb
                     override y.RawUrl = path
                     override y.PathInfo = path
@@ -39,8 +40,9 @@ module Testing =
         }
 
     let getController verb path =
-        tryGetController verb path
-        |> Option.getOrElse (failwithf "No controller found for %s %s" verb path)
+        match tryGetController verb path with
+        | Some v -> v
+        | _ -> failwithf "No controller found for %s %s" verb path
 
     let buildResponse route resp =
         let ctx =
