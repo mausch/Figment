@@ -5,17 +5,6 @@ open System.Diagnostics
 open System.Web
 open System.Web.Routing
 
-module Option =
-    type MaybeBuilder() =
-        member x.Bind(a,f) = Option.bind f a
-        member x.Return v = Some v
-        member x.Zero() = None
-    let builder = MaybeBuilder()
-    let inline getOrElse f =
-        function
-        | Some v -> v
-        | _ -> f()  
-
 module Testing =
 
     let buildRequest verb path =
@@ -32,12 +21,11 @@ module Testing =
 
     let tryGetController verb path =
         let ctx = buildRequest verb path
-        Option.builder {
-            let! route = RouteTable.Routes.tryGetRouteData ctx
-            let rctx = RequestContext(ctx, route)
-            let handler : Figment.IControllerProvider = unbox <| route.RouteHandler.GetHttpHandler(rctx)
-            return route, handler.CreateController()
-        }
+        RouteTable.Routes.tryGetRouteData ctx
+        |> Option.map (fun route ->
+                        let rctx = RequestContext(ctx, route)
+                        let handler : Figment.IControllerProvider = unbox <| route.RouteHandler.GetHttpHandler(rctx)
+                        route, handler.CreateController())
 
     let getController verb path =
         match tryGetController verb path with
