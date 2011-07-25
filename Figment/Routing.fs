@@ -109,8 +109,11 @@ module Routing =
         | [] -> failwith "no function types!"
         | hd::[] -> []
         | hd::tl -> 
-            let v = bindSingleParameterNG hd (List.head parameters) ctx.Controller.ValueProvider ctx
-            v::bindAll tl (List.tail parameters) ctx
+            match parameters with
+            | p::ps ->
+                let v = bindSingleParameterNG hd p ctx.Controller.ValueProvider ctx
+                v::bindAll tl ps ctx
+            | [] -> failwith "empty parameters"
 
     let getnf (fmt: PrintfFormat<'a -> 'b, unit, unit, FAction>) routeName (action: 'a -> 'b) =
         let url, parameters = stripFormatting fmt.Value
