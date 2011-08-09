@@ -44,6 +44,7 @@
     <Compile Include="Routing.fs" />
     <Compile Include="Filters.fs" />
     <Compile Include="Testing.fs" />
+    <Compile Include="Server.fs" />
     <EmbeddedResource Include="web.config" />
   </ItemGroup>
   <ItemGroup>
