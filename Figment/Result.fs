@@ -12,6 +12,12 @@ module Result =
 
     let result = ReaderBuilder()
 
+    let inline bind f m = result.Bind(m,f)
+    let inline combine a b = result.Bind(a, fun _ -> b)
+    let (>>=) = bind
+    let (>>.) = combine
+    let inline map f m = result.Bind(m, fun a -> result.Return (f a))
+
     let empty : FAction = EmptyResult() |> fromActionResult
 
     let view viewName model = 
@@ -88,7 +94,8 @@ module Result =
             do! contentType "application/javascript"
         }
 
-    open Figment.ReaderOperators
+    let getQueryString (key: string) (ctx: ControllerContext) : string option = 
+        ctx.Request.QueryString.[key] |> Option.fromNull
 
     let xml data = 
         // charset?

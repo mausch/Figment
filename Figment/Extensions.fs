@@ -12,6 +12,12 @@ open System.Text.RegularExpressions
 open System.Web.Caching
 open System.Linq
 
+module Option =
+    let fromNull =
+        function
+        | null -> None
+        | a -> Some a
+
 [<AutoOpen>]
 module Extensions = 
     let internal bindingFlags = BindingFlags.NonPublic ||| BindingFlags.Instance
