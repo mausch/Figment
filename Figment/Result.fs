@@ -15,6 +15,7 @@ module Result =
     let inline bind f m = result.Bind(m,f)
     let inline combine a b = result.Bind(a, fun _ -> b)
     let inline (>>=) m f = bind f m
+    let inline (=<<) f m = bind f m
     let (>>.) = combine
     let inline map f m = result.Bind(m, fun a -> result.Return (f a))
 
