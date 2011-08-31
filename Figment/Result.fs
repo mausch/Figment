@@ -94,8 +94,13 @@ module Result =
             do! contentType "application/javascript"
         }
 
-    let getQueryString (key: string) (ctx: ControllerContext) : string option = 
+    let getQueryString (key: string) (ctx: ControllerContext) = 
         ctx.Request.QueryString.[key] |> Option.fromNull
+
+    let getQueryStringOrFail (key: string) (ctx: ControllerContext) = 
+        match getQueryString key ctx with
+        | None -> failwithf "Missing required querystring key '%s'" key
+        | Some v -> v
 
     let xml data = 
         // charset?
