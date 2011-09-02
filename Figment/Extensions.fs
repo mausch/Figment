@@ -232,8 +232,12 @@ module Extensions =
             x.GetService<HttpApplication>().Context
 
     type HttpSessionStateBase with
-        member x.Get (n: string) = unbox x.[n]
-        member x.Set (n: string) v = x.[n] <- v
+        member x.Get (key: string) = unbox x.[key]
+        member x.Pop (key: string) =
+            let v = x.[key]
+            x.Remove key
+            unbox v
+        member x.Set (key: string) v = x.[key] <- v
         member x.AsDictionary() =
             let notimpl() = raise <| NotImplementedException()
             let getEnumerator() =
