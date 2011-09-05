@@ -3,6 +3,7 @@
 [<AutoOpen>]
 module Result =
 
+    open System
     open System.Linq
     open System.Web
     open System.Web.Mvc
@@ -109,3 +110,11 @@ module Result =
         (fun ctx ->
             let serializer = System.Xml.Serialization.XmlSerializer(data.GetType())
             serializer.Serialize(ctx.HttpContext.Response.Output, data))
+
+    let noCache (ctx: ControllerContext) =
+        let cache = ctx.Response.Cache
+        cache.SetExpires(DateTime.UtcNow.AddDays(-1.0))
+        cache.SetValidUntilExpires(false)
+        cache.SetRevalidation(HttpCacheRevalidation.AllCaches)
+        cache.SetCacheability(HttpCacheability.NoCache)
+        cache.SetNoStore()
