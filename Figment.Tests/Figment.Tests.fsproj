@@ -42,6 +42,9 @@
     <Compile Include="ResultTests.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharpx">
+      <HintPath>..\lib\FSharpx.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core" />
     <Reference Include="System" />

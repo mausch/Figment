@@ -10,15 +10,9 @@ module Result =
     open System.Web.Routing
     open Figment.Helpers
     open Figment.Extensions
+    open FSharpx.Reader
 
     let result = ReaderBuilder()
-
-    let inline bind f m = result.Bind(m,f)
-    let inline combine a b = result.Bind(a, fun _ -> b)
-    let inline (>>=) m f = bind f m
-    let inline (=<<) f m = bind f m
-    let (>>.) = combine
-    let inline map f m = result.Bind(m, fun a -> result.Return (f a))
 
     let empty : FAction = EmptyResult() |> fromActionResult
 
@@ -96,8 +90,10 @@ module Result =
             do! contentType "application/javascript"
         }
 
-    let getQueryString (key: string) (ctx: ControllerContext) = 
-        ctx.Request.QueryString.[key] |> Option.fromNull
+    let getQueryString (key: string) (ctx: ControllerContext): string option = 
+        match ctx.Request.QueryString.[key] with
+        | null -> None
+        | a -> Some a
 
     let getQueryStringOrFail (key: string) (ctx: ControllerContext) = 
         match getQueryString key ctx with
