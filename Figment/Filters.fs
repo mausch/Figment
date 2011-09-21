@@ -27,8 +27,8 @@ module Filters =
         if not user.Identity.IsAuthenticated
             then false
             else
-                let userMatch = allowedUsers.Length = 0 || Enumerable.Any(allowedUsers, fun u -> u = user.Identity.Name)
-                let roleMatch = allowedRoles.Length = 0 || Enumerable.Any(allowedRoles, fun r -> user.IsInRole r)
+                let userMatch = allowedUsers.Length = 0 || (Seq.exists ((=) user.Identity.Name) allowedUsers)
+                let roleMatch = allowedRoles.Length = 0 || (Seq.exists user.IsInRole allowedRoles)
                 userMatch && roleMatch
 
     let authorize (allowedUsers: string list) (allowedRoles: string list) (action: FAction) : FAction = 
