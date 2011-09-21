@@ -10,6 +10,7 @@ module Result =
     open System.Web.Routing
     open Figment.Helpers
     open Figment.Extensions
+    open FSharpx
     open FSharpx.Reader
 
     let result = ReaderBuilder()
@@ -96,9 +97,8 @@ module Result =
         | a -> Some a
 
     let getQueryStringOrFail (key: string) (ctx: ControllerContext) = 
-        match getQueryString key ctx with
-        | None -> failwithf "Missing required querystring key '%s'" key
-        | Some v -> v
+        getQueryString key ctx
+        |> Option.getOrElseF (fun () -> failwithf "Missing required querystring key '%s'" key)
 
     let xml data = 
         // charset?

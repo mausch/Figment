@@ -4,6 +4,7 @@ open System
 open System.Diagnostics
 open System.Web
 open System.Web.Routing
+open FSharpx
 
 module Testing =
 
@@ -28,9 +29,8 @@ module Testing =
                         route, handler.CreateController())
 
     let getController verb path =
-        match tryGetController verb path with
-        | Some v -> v
-        | _ -> failwithf "No controller found for %s %s" verb path
+        tryGetController verb path
+        |> Option.getOrElseF (fun () -> failwithf "No controller found for %s %s" verb path)
 
     let buildResponse route resp =
         let ctx =
