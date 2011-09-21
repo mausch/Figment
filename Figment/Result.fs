@@ -6,6 +6,7 @@ module Result =
     open System
     open System.Linq
     open System.Web
+    open System.Web.UI
     open System.Web.Mvc
     open System.Web.Routing
     open Figment.Helpers
@@ -114,3 +115,9 @@ module Result =
         cache.SetRevalidation(HttpCacheRevalidation.AllCaches)
         cache.SetCacheability(HttpCacheability.NoCache)
         cache.SetNoStore()
+
+    let setCache (settings: OutputCacheParameters) (ctx: ControllerContext) =
+        let cachePolicy = ctx.HttpContext.Response.Cache
+        cachePolicy.SetExpires(ctx.HttpContext.Timestamp.AddSeconds(float settings.Duration))
+        // TODO set the other cache parameters
+        

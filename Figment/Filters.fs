@@ -39,13 +39,6 @@ module Filters =
                 then action ctx
                 else unauthorized ctx
 
-    let cache (settings: OutputCacheParameters) (action: FAction) : FAction =
-        fun ctx ->
-            let cachePolicy = ctx.HttpContext.Response.Cache
-            cachePolicy.SetExpires(ctx.HttpContext.Timestamp.AddSeconds(float settings.Duration))
-            // TODO set the other cache parameters
-            action ctx
-
     let requireHttps (action: FAction) : FAction = 
         Internals.irequireHttps action redirect
 
