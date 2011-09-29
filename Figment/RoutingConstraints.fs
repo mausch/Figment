@@ -3,9 +3,11 @@
 [<AutoOpen>]
 module RoutingConstraints =
 
+    open System
     open System.Text.RegularExpressions
     open System.Web
     open System.Web.Routing
+    open Helpers
 
     type RouteConstraint = HttpContextBase * RouteData -> bool
 
@@ -63,9 +65,6 @@ module RoutingConstraints =
         let rxx = Regex(rx)
         fun (ctx: HttpContextBase, route: RouteData) ->
             rxx.IsMatch ctx.Request.UserAgent
-
-    open System
-    open Helpers
 
     let ifIsAjax (ctx: HttpContextBase, route: RouteData) =
         let requestedWith = ctx.Request.Headers.["X-Requested-With"]
