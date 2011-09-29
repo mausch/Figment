@@ -150,4 +150,15 @@ module Result =
                                        Path = cookie.Path,
                                        Secure = cookie.Secure)
             setHttpCookie expiredCookie ctx
+
+
+    let internal flashCookieKey = "FigmentFlash"
+    let internal flashContextKey = obj()
+
+    // TODO encrypt
+    // see http://www.codinginstinct.com/2008/09/encrypt-cookie-using-machine-key.html
+    let setFlash (value: string) = 
+        setHttpCookie (HttpCookie(name = flashCookieKey, value = base64encode value))
+
+    let getFlash x = getFromContext flashContextKey x
                  

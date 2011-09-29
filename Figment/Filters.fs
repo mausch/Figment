@@ -21,6 +21,9 @@ module private Internals =
 
 module Filters = 
 
+    open FSharpx
+    open FSharpx.Reader
+
     type Filter = FAction -> FAction
 
     let hasAuthorization (allowedUsers: string list) (allowedRoles: string list) (user: IPrincipal) =
@@ -41,6 +44,18 @@ module Filters =
 
     let requireHttps (action: FAction) : FAction = 
         Internals.irequireHttps action redirect
+
+    let internal getCookieValueOrNull name ctx = 
+        match getHttpCookie name ctx with
+        | None -> null
+        | Some c -> c.Value
+
+    let flash (a: FAction): FAction =
+        getCookieValueOrNull flashCookieKey
+        |> Reader.map base64decode
+        >>= setInContext flashContextKey
+        >>. removeHttpCookie flashCookieKey
+        >>. a
 
     let apply (filter: Filter) (actions: seq<string * FAction>) =
         actions |> Seq.map (fun (k,v) -> (k, filter v))
