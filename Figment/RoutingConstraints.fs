@@ -30,11 +30,11 @@ module RoutingConstraints =
 
     let ifPathIs url =
         fun (ctx: HttpContextBase, route: RouteData) ->
-            ctx.Request.Url.AbsolutePath = "/"+url
+            ctx.Request.Url.AbsolutePath = url
 
     let ifInsensitivePathIs url =
         fun (ctx: HttpContextBase, route: RouteData) ->
-            ctx.Request.Url.AbsolutePath =. "/"+url
+            ctx.Request.Url.AbsolutePath =. url
 
     let ifPathIsf fmt = Printf.ksprintf ifPathIs fmt
 
