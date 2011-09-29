@@ -17,8 +17,8 @@ module Testing =
                     override y.RawUrl = path
                     override y.PathInfo = path
                     override y.AppRelativeCurrentExecutionFilePath = "~/"
-                    override y.Path = "/" + path
-                    override y.Url = Uri("http://localhost/" + path) }}
+                    override y.Path = path
+                    override y.Url = Uri("http://localhost" + path) }}
 
     let tryGetController verb path =
         let ctx = buildRequest verb path

@@ -54,8 +54,8 @@ module Routing =
 
         member private this.MapWithMethod(url, routeName, httpMethod, handler) = 
             let httpMethodConstraint = HttpMethodConstraint([| httpMethod |])
-            let constraints = RouteValueDictionary(dict [("httpMethod", httpMethodConstraint :> obj)])
-            let route = Route(url, this.GetDefaultRouteValueDictionary(), constraints, handler)
+            let constraints = RouteValueDictionary(dict [("httpMethod", box httpMethodConstraint)])
+            let route = Route(Regex.Replace(url, "^/", ""), this.GetDefaultRouteValueDictionary(), constraints, handler)
             this.Add(routeName, route)
             route
 

@@ -77,7 +77,7 @@ module Helpers =
             member x.InvokeAction(ctx, actionName) = f ctx actionName }
 
     let buildControllerFromAction (action: FAction) =
-        { new Controller() with 
+        { new Controller(ValidateRequest = false) with 
             override x.CreateActionInvoker() = 
                 upcast { new ControllerActionInvoker() with
                             override y.FindAction(ctx, descriptor, actionName) = 
