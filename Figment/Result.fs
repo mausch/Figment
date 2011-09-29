@@ -101,6 +101,12 @@ module Result =
         getQueryString key ctx
         |> Option.getOrElseF (fun () -> failwithf "Missing required querystring key '%s'" key)
 
+    let setInContext k v (ctx: ControllerContext) =
+        ctx.[k] <- v
+
+    let getFromContext k (ctx: ControllerContext) =
+        unbox ctx.[k]
+
     let xml data = 
         // charset?
         contentType "text/xml" >>.
