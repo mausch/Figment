@@ -189,5 +189,6 @@ module Extensions =
         member x.GetValue n = 
             let r = x.Controller.ValueProvider.GetValue n
             unbox r.RawValue
-        member x.Item 
-            with get k = x.Request.[k]
+        member x.Item
+            with get k = unbox x.HttpContext.Items.[k]
+            and set k v = x.HttpContext.Items.[k] <- v
