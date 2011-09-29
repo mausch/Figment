@@ -4,6 +4,8 @@
 module Helpers =
 
     open System
+    open System.Collections.Specialized
+    open System.Text
     open System.Reflection
     open System.Web
     open System.Web.Routing
@@ -110,7 +112,17 @@ module Helpers =
         genericMethod.Invoke(null, null)
 
     let inline htmlencode x = HttpUtility.HtmlEncode x
+    let inline htmldecode x = HttpUtility.HtmlDecode x
     let inline urlencode (x: string) = HttpUtility.UrlEncode x
+    let inline urldecode (x: string) = HttpUtility.UrlDecode x
+    let inline base64encode (x: string) = 
+        if x = null
+            then null
+            else Convert.ToBase64String(Encoding.UTF8.GetBytes(x))
+    let inline base64decode (x: string) = 
+        if x = null
+            then null
+            else Encoding.UTF8.GetString(Convert.FromBase64String(x))
 
     type DelegatingHttpRequestBase(request: HttpRequestBase) =
         inherit HttpRequestBase() 
@@ -207,3 +219,4 @@ module Helpers =
     let withRequest (req: HttpRequestBase) (ctx: HttpContextBase) =
         { new DelegatingHttpContextBase(ctx) with
             override x.Request = req }
+
