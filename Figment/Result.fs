@@ -126,4 +126,28 @@ module Result =
         let cachePolicy = ctx.HttpContext.Response.Cache
         cachePolicy.SetExpires(ctx.HttpContext.Timestamp.AddSeconds(float settings.Duration))
         // TODO set the other cache parameters
+
+    let setHttpCookie (c: HttpCookie) (ctx: ControllerContext) =
+        ctx.Response.SetCookie c
         
+    let getHttpCookie (name: string) (ctx: ControllerContext) =
+        match ctx.Request.Cookies.[name] with
+        | null -> None
+        | a -> Some a
+
+    let removeHttpCookie (name: string) (ctx: ControllerContext) =
+        match getHttpCookie name ctx with
+        | None -> ()
+        | Some cookie ->
+            let expiration = 
+                if cookie.Expires = DateTime.MinValue
+                    then cookie.Expires
+                    else cookie.Expires.AddYears(-1)
+            let expiredCookie = HttpCookie(name = cookie.Name, 
+                                       Domain = cookie.Domain, 
+                                       Expires = expiration,
+                                       HttpOnly = cookie.HttpOnly,
+                                       Path = cookie.Path,
+                                       Secure = cookie.Secure)
+            setHttpCookie expiredCookie ctx
+                 
