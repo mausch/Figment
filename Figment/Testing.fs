@@ -110,19 +110,5 @@ module Testing =
                         and set v = timeout := v
                  } } :> HttpContextBase    
 
-//    let buildResponse route resp =
-//        let ctx =
-//            { new HttpContextBase() with
-//                override x.Session = 
-//                    { new HttpSessionStateBase() with
-//                        override y.Item 
-//                            with get (k:string) = box null 
-//                            and set (k: string) (v:obj) = () }
-//                override x.Request =
-//                    { new HttpRequestBase() with
-//                        override y.ValidateInput() = ()
-//                        override y.Path = "" }
-//                override x.Response = resp }
-//        RequestContext(ctx, route)
-//    
-//
+    let withRoute route (ctx: ControllerContext) = 
+        ControllerContext(ctx.HttpContext, route, ctx.Controller)
