@@ -10,17 +10,15 @@ open Figment.RoutingConstraints
 [<Fact>]
 let stripFormattingTest() =
     let url, parameters = stripFormatting "/question/{id:%d}/{title}"
-    Assert.Equal("/question/{id}/{title}", url)
+    Assert.Equal<string>("/question/{id}/{title}", url)
     Assert.Equal(1, parameters.Length)
-    Assert.Equal("id", parameters.[0])
+    Assert.Equal<string>("id", parameters.[0])
 
     let url, parameters = stripFormatting "/question/{id:%d}/{title:%s}"
-    Assert.Equal("/question/{id}/{title}", url)
+    Assert.Equal<string>("/question/{id}/{title}", url)
     Assert.Equal(2, parameters.Length)
-    Assert.Equal("id", parameters.[0])
-    Assert.Equal("title", parameters.[1])
-
-    ()
+    Assert.Equal<string>("id", parameters.[0])
+    Assert.Equal<string>("title", parameters.[1])
 
 [<Fact>]
 let urlMatchesTest() =
@@ -31,4 +29,3 @@ let urlMatchesTest() =
     let c = ctx, route
     Assert.True(ifUrlMatches "^/some" c)
     Assert.False(ifUrlMatches "^/some$" c)
-    ()

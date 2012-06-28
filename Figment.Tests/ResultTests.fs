@@ -38,5 +38,5 @@ let ``JSONP content type is application/javascript``() =
                     sb.Append s |> ignore }
     let ctx = buildCtx ctx
     jsonp callback "something" ctx
-    Assert.Equal("callback(\"something\")", sb.ToString())
-    Assert.Equal("application/javascript", ctx.HttpContext.Response.ContentType)
+    Assert.Equal<string>("callback(\"something\")", sb.ToString())
+    Assert.Equal<string>("application/javascript", ctx.HttpContext.Response.ContentType)
