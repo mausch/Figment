@@ -40,10 +40,12 @@
     </None>
     <Compile Include="ExtensionsTests.fs" />
     <Compile Include="ResultTests.fs" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharpx.Core">
-      <HintPath>..\lib\FSharpx.Core.dll</HintPath>
+      <HintPath>..\packages\FSharpx.Core.1.6.4\lib\40\Fsharpx.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core" />
