@@ -5,6 +5,11 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Figment", "Figment\Figment.
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Figment.Tests", "Figment.Tests\Figment.Tests.fsproj", "{D5A17CEF-E6A6-459D-961F-588A1A1DCD49}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C36EB5AB-6A5E-4950-924D-E694E16035C6}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
