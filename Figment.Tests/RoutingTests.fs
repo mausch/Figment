@@ -1,9 +1,8 @@
-﻿module RoutingTests
+﻿module Figment.Tests.Routing
 
 open System
 open System.Web
 open System.Web.Routing
-open Xunit
 open Figment.Routing
 open Figment.RoutingConstraints
 open Fuchu
@@ -14,16 +13,16 @@ let tests =
         testList "stripFormatting" [
             testCase "one int" <| fun _ ->
                 let url, parameters = stripFormatting "/question/{id:%d}/{title}"
-                Assert.Equal<string>("/question/{id}/{title}", url)
-                Assert.Equal(1, parameters.Length)
-                Assert.Equal<string>("id", parameters.[0])
+                assertEqual "/question/{id}/{title}" url
+                assertEqual 1 parameters.Length
+                assertEqual "id" parameters.[0]
 
             testCase "one int and one string" <| fun _ -> 
                 let url, parameters = stripFormatting "/question/{id:%d}/{title:%s}"
-                Assert.Equal<string>("/question/{id}/{title}", url)
-                Assert.Equal(2, parameters.Length)
-                Assert.Equal<string>("id", parameters.[0])
-                Assert.Equal<string>("title", parameters.[1])
+                assertEqual "/question/{id}/{title}" url
+                assertEqual 2 parameters.Length
+                assertEqual "id" parameters.[0]
+                assertEqual "title" parameters.[1]
         ]
 
         testCase "ifUrlMatches" <| fun _ ->
@@ -32,6 +31,8 @@ let tests =
                             override x.Url = Uri("http://localhost/something")}}
             let route = RouteData()
             let c = ctx, route
-            Assert.True(ifUrlMatches "^/some" c)
-            Assert.False(ifUrlMatches "^/some$" c)            
+            if not (ifUrlMatches "^/some" c) 
+                then failtest "Should have matched ^/some"
+            if ifUrlMatches "^/some$" c 
+                then failtest "Should not have matched ^/some$"
     ]
