@@ -22,7 +22,7 @@ let tests =
                             and set v = statusCode := v }
             let ctx = buildCtx ctx
             status 200 ctx
-            assertEqual 200 ctx.HttpContext.Response.StatusCode
+            Assert.Equal("status code", 200, ctx.HttpContext.Response.StatusCode)
             
         testCase "JSONP content type is application/javascript" <| fun _ ->
             let callback (ctx: ControllerContext) = "callback"
@@ -38,6 +38,6 @@ let tests =
                             sb.Append s |> ignore }
             let ctx = buildCtx ctx
             jsonp callback "something" ctx
-            assertEqual "callback(\"something\")" (sb.ToString())
-            assertEqual "application/javascript" ctx.HttpContext.Response.ContentType
+            Assert.Equal("response", "callback(\"something\")", sb.ToString())
+            Assert.Equal("content type", "application/javascript", ctx.HttpContext.Response.ContentType)
     ]

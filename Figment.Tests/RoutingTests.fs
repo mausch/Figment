@@ -13,16 +13,16 @@ let tests =
         testList "stripFormatting" [
             testCase "one int" <| fun _ ->
                 let url, parameters = stripFormatting "/question/{id:%d}/{title}"
-                assertEqual "/question/{id}/{title}" url
-                assertEqual 1 parameters.Length
-                assertEqual "id" parameters.[0]
+                Assert.Equal("url", "/question/{id}/{title}", url)
+                Assert.Equal("parameter length", 1, parameters.Length)
+                Assert.Equal("first parameter", "id", parameters.[0])
 
             testCase "one int and one string" <| fun _ -> 
                 let url, parameters = stripFormatting "/question/{id:%d}/{title:%s}"
-                assertEqual "/question/{id}/{title}" url
-                assertEqual 2 parameters.Length
-                assertEqual "id" parameters.[0]
-                assertEqual "title" parameters.[1]
+                Assert.Equal("url", "/question/{id}/{title}", url)
+                Assert.Equal("parameter length", 2, parameters.Length)
+                Assert.Equal("first parameter", "id", parameters.[0])
+                Assert.Equal("2nd parameter", "title", parameters.[1])
         ]
 
         testCase "ifUrlMatches" <| fun _ ->
